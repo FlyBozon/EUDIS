@@ -2,6 +2,8 @@
 venv/
 output/
 data/
+DroneAudioDataset/
+detections/
 
 # Microcontroller
 Microcontroller/.pio
@@ -79,3 +81,4 @@ coverage
 # Misc
 *.tsbuildinfo
 
+DroneAudioDataset/*
