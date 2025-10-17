@@ -1,12 +1,81 @@
+# Venv and data
 venv/
 output/
 data/
 
-
+# Microcontroller
 Microcontroller/.pio
 Microcontroller/.vscode/.browse.c_cpp.db*
 Microcontroller/.vscode/c_cpp_properties.json
 Microcontroller/.vscode/launch.json
 Microcontroller/.vscode/ipch
 Microcontroller/private/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies
+node_modules
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+dist
+dist-ssr
+*.local
+build
+.turbo
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+.git
+.gitkeep
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Testing
+coverage
+.nyc_output
+
+# Misc
+*.tsbuildinfo
 

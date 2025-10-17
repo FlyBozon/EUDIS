@@ -1,0 +1,61 @@
+/* Leaflet customization */
+.leaflet-container {
+  @apply rounded-lg;
+}
+
+.leaflet-pane {
+  @apply z-auto;
+}
+
+.leaflet-control-container .leaflet-top,
+.leaflet-control-container .leaflet-bottom {
+  @apply z-40;
+}
+
+/* Zoom control positioning - move to bottom left */
+.leaflet-bottom.leaflet-left {
+  @apply bottom-4 left-4 !important;
+}
+
+.leaflet-control-zoom {
+  @apply bg-card border border-border rounded-lg shadow-lg !important;
+}
+
+.leaflet-control-zoom a {
+  @apply bg-background hover:bg-accent text-foreground w-10 h-10 flex items-center justify-center font-bold border-b border-border !important;
+}
+
+.leaflet-control-zoom a:first-child {
+  @apply rounded-t-lg !important;
+}
+
+.leaflet-control-zoom a:last-child {
+  @apply rounded-b-lg border-b-0 !important;
+}
+
+/* Detection animation */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(245, 158, 11, 0);
+  }
+}
+
+.detection-marker {
+  animation: pulse-glow 2s infinite;
+}
+
+/* Dark mode for Leaflet */
+.dark .leaflet-container {
+  @apply bg-slate-900;
+}
+
+.dark .leaflet-tile {
+  filter: brightness(0.7) contrast(1.1);
+}
+
+.dark .leaflet-control-attribution {
+  @apply bg-slate-800/90 text-gray-300;
+}
