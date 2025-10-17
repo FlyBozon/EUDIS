@@ -1,3 +1,12 @@
 venv/
 output/
 data/
+
+
+Microcontroller/.pio
+Microcontroller/.vscode/.browse.c_cpp.db*
+Microcontroller/.vscode/c_cpp_properties.json
+Microcontroller/.vscode/launch.json
+Microcontroller/.vscode/ipch
+Microcontroller/private/
+
