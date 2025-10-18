@@ -116,6 +116,16 @@ export const DetectionSimulator = () => {
             
             // Krótsza przerwa między detekcjami
             if (currentTime - lastDetectionTime >= 500) {
+              // Usuń poprzednie wykrycie z tej pary dron-czujnik (jeśli istnieje)
+              useAppStore.setState((state) => ({
+                detections: state.detections.filter((d) => {
+                  // Sprawdź czy to wykrycie pochodzi z tej samej pary dron-czujnik
+                  const detectionKey = d.id.split('-')[2] + '-' + d.lineId; // droneIdx-nodeId
+                  const currentKey = droneIdx + '-' + node.id;
+                  return detectionKey !== currentKey;
+                }),
+              }));
+
               // Intensywność zależy od odległości (im bliżej, tym silniejszy sygnał)
               const intensityBase = 100 - (distance / DETECTION_RANGE_METERS) * 40; // 60-100%
               const intensity = Math.max(60, Math.min(100, intensityBase + (Math.random() - 0.5) * 10));
@@ -134,12 +144,12 @@ export const DetectionSimulator = () => {
               addDetection(detection);
               lastDetectionTimeRef.current[droneNodeKey] = currentTime;
 
-              // Usuń detekcje po krótszym czasie (1.5s zamiast 3s)
+              // Usuń detekcje po dłuższym czasie (3s) - ale i tak będzie tylko jedno per para
               setTimeout(() => {
                 useAppStore.setState((state) => ({
                   detections: state.detections.filter((d) => d.id !== detection.id),
                 }));
-              }, 1500);
+              }, 3000);
             }
           }
         });

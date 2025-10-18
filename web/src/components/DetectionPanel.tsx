@@ -4,16 +4,16 @@ export const DetectionPanel = () => {
   const detections = useAppStore((state) => state.detections);
   const espNodes = useAppStore((state) => state.espNodes);
 
-  const recentDetections = detections.slice(-9).reverse();
+  const recentDetections = detections.slice(-50).reverse(); // Zwiększ limit aby scroll miał sens
 
   return (
-    <div className="bg-card border border-border rounded-lg p-4 h-full flex flex-col">
+    <div className="bg-card border border-border rounded-lg p-4 flex flex-col" style={{ height: '465px' }}>
       <div className="flex items-center gap-2 mb-4 flex-shrink-0">
         <h2 className="font-semibold">Wykrycia</h2>
         <span className="ml-auto text-sm text-muted-foreground">{detections.length}</span>
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-2 min-h-0 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+      <div className="overflow-y-auto space-y-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent pr-1" style={{ height: '433px', scrollbarGutter: 'stable' }}>
         {recentDetections.length === 0 ? (
           <div className="flex items-center justify-center h-full text-muted-foreground">
             <p className="text-sm">Brak wykryć</p>
