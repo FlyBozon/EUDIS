@@ -72,7 +72,7 @@ void update_neopixel();
 void detect_loud_sound(const int16_t* buffer, size_t size, unsigned long current_time);
 void detect_drone(unsigned long current_time);
 static void print_memory(const char* tag) {
-    size_t free_int = heap_caps_get_free_size(MALLOC_CAP_8BIT);
+    size_t free_int = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
     size_t free_psram = heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
     Serial.printf("[MEM] %-16s | Free INT: %u bytes (%.1f KB) | Free PSRAM: %u bytes (%.1f KB)\n",
                   tag, (unsigned)free_int, free_int/1024.0, (unsigned)free_psram, free_psram/1024.0);
