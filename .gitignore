@@ -4,6 +4,11 @@ output/
 data/
 DroneAudioDataset/
 detections/
+*.pth
+urban-sound-8k
+*.zip
+*.pkl
+
 
 # Microcontroller
 Microcontroller/.pio
