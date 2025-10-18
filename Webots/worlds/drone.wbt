@@ -1,0 +1,442 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/trees/protos/Pine.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/dji/mavic/protos/Mavic2Pro.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/rocks/protos/Rock.proto"
+
+WorldInfo {
+  info [
+    "Simple drone animation with camera"
+    "Created with Claude Code"
+  ]
+  title "Flying Drone Animation"
+  basicTimeStep 16
+  defaultDamping Damping {
+    linear 0.5
+    angular 0.5
+  }
+}
+DEF MAIN_VP Viewpoint {
+  orientation -0.3007679386167829 0.2005119590778553 0.9323806097120271 2
+  position 18 -15 8
+}
+DEF CAM_FOLLOW Viewpoint {
+  orientation -0.3007679386167829 0.2005119590778553 0.9323806097120271 2
+  position -8 0 5
+}
+DEF CAM_FRONT Viewpoint {
+  orientation -0.1582291646366687 0.8251082166340057 0.5423651558695789 0.756879787846086
+  position -6.104285205782359 -8.875017177548067 17.775226832866217
+}
+TexturedBackground {
+  luminosity 1.5
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  translation 70 0 0
+  floorSize 200 40
+  floorTileSize 2 2
+  floorAppearance PBRAppearance {
+    baseColorMap ImageTexture {
+      url [
+        "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/default/worlds/textures/dry_grass.jpg"
+      ]
+    }
+    roughness 1
+    metalness 0
+  }
+}
+Pine {
+  translation 3 -5 0
+  rotation 0 0 1 0.3
+  name "pine_1"
+}
+Pine {
+  translation 8 6 0
+  rotation 0 0 1 1.2
+  name "pine_2"
+}
+Pine {
+  translation 12 -7 0
+  rotation 0 0 1 2.1
+  name "pine_3"
+}
+Pine {
+  translation 18 8 0
+  rotation 0 0 1 0.8
+  name "pine_4"
+}
+Pine {
+  translation 22 -6 0
+  rotation 0 0 1 1.9
+  name "pine_5"
+}
+Pine {
+  translation 28 7 0
+  rotation 0 0 1 0.5
+  name "pine_6"
+}
+Pine {
+  translation 33 -8 0
+  rotation 0 0 1 2.5
+  name "pine_7"
+}
+Pine {
+  translation 10 -10 0
+  rotation 0 0 1 1.7
+  name "pine_8"
+}
+Pine {
+  translation 15 -4 0
+  rotation 0 0 1 0.9
+  name "pine_9"
+}
+Pine {
+  translation 25 9 0
+  rotation 0 0 1 2.8
+  name "pine_10"
+}
+Pine {
+  translation 30 -3 0
+  rotation 0 0 1 1.1
+  name "pine_11"
+}
+Pine {
+  translation 37 5 0
+  rotation 0 0 1 0.6
+  name "pine_12"
+}
+Pine {
+  translation 2 8 0
+  rotation 0 0 1 1.3
+  name "pine_13"
+}
+Pine {
+  translation 6 -3 0
+  rotation 0 0 1 2.7
+  name "pine_14"
+}
+Pine {
+  translation 20 10 0
+  rotation 0 0 1 0.4
+  name "pine_15"
+}
+Pine {
+  translation 35 7 0
+  rotation 0 0 1 1.9
+  name "pine_16"
+}
+Pine {
+  translation 40 -5 0
+  rotation 0 0 1 2.4
+  name "pine_17"
+}
+Pine {
+  translation 42 8 0
+  rotation 0 0 1 0.7
+  name "pine_18"
+}
+Pine {
+  translation 38 -9 0
+  rotation 0 0 1 1.6
+  name "pine_19"
+}
+Pine {
+  translation 44 3 0
+  rotation 0 0 1 2.2
+  name "pine_20"
+}
+Pine {
+  translation 17 -9 0
+  rotation 0 0 1 0.9
+  name "pine_21"
+}
+Pine {
+  translation 27 -7 0
+  rotation 0 0 1 1.4
+  name "pine_22"
+}
+Pine {
+  translation 4 4 0
+  rotation 0 0 1 2
+  name "pine_23"
+}
+Pine {
+  translation 13 9 0
+  rotation 0 0 1 0.5
+  name "pine_24"
+}
+Pine {
+  translation 32 -5 0
+  rotation 0 0 1 1.8
+  name "pine_25"
+}
+Pine {
+  translation 50 6 0
+  rotation 0 0 1 1.3
+  name "pine_26"
+}
+Pine {
+  translation 58 -7 0
+  rotation 0 0 1 2.6
+  name "pine_27"
+}
+Pine {
+  translation 65 9 0
+  rotation 0 0 1 0.4
+  name "pine_28"
+}
+Pine {
+  translation 72 -4 0
+  rotation 0 0 1 1.9
+  name "pine_29"
+}
+Pine {
+  translation 80 8 0
+  rotation 0 0 1 0.7
+  name "pine_30"
+}
+Pine {
+  translation 88 -10 0
+  rotation 0 0 1 2.3
+  name "pine_31"
+}
+Pine {
+  translation 95 5 0
+  rotation 0 0 1 1.1
+  name "pine_32"
+}
+Pine {
+  translation 102 -6 0
+  rotation 0 0 1 0.9
+  name "pine_33"
+}
+Pine {
+  translation 110 7 0
+  rotation 0 0 1 2.1
+  name "pine_34"
+}
+Pine {
+  translation 118 -8 0
+  rotation 0 0 1 1.5
+  name "pine_35"
+}
+Pine {
+  translation 125 10 0
+  rotation 0 0 1 0.6
+  name "pine_36"
+}
+Pine {
+  translation 132 -5 0
+  rotation 0 0 1 2.4
+  name "pine_37"
+}
+Pine {
+  translation 140 8 0
+  rotation 0 0 1 1.2
+  name "pine_38"
+}
+Pine {
+  translation 147 -7 0
+  rotation 0 0 1 0.8
+  name "pine_39"
+}
+Pine {
+  translation 54 -11 0
+  rotation 0 0 1 1.7
+  name "pine_40"
+}
+Pine {
+  translation 69 3 0
+  rotation 0 0 1 2.2
+  name "pine_41"
+}
+Pine {
+  translation 77 -9 0
+  rotation 0 0 1 0.5
+  name "pine_42"
+}
+Pine {
+  translation 92 -3 0
+  rotation 0 0 1 1.8
+  name "pine_43"
+}
+Pine {
+  translation 106 11 0
+  rotation 0 0 1 2.7
+  name "pine_44"
+}
+Pine {
+  translation 120 4 0
+  rotation 0 0 1 0.9
+  name "pine_45"
+}
+Pine {
+  translation 135 -10 0
+  rotation 0 0 1 1.4
+  name "pine_46"
+}
+Pine {
+  translation 143 6 0
+  rotation 0 0 1 2.5
+  name "pine_47"
+}
+Rock {
+  translation 5 2 0
+  rotation 0 0 1 0.6
+  scale 15
+  name "rock_1"
+}
+Rock {
+  translation 11 3 0
+  rotation 0 0 1 2.8
+  scale 12
+  name "rock_2"
+}
+Rock {
+  translation 16 -3 0
+  scale 18
+  name "rock_3"
+}
+Rock {
+  translation 23 2 0
+  scale 14
+  name "rock_4"
+}
+Rock {
+  translation 29 -2 0
+  scale 20
+  name "rock_5"
+}
+Rock {
+  translation 7 -2 0
+  scale 16
+  name "rock_cluster_1"
+}
+Rock {
+  translation 14 -5 0
+  scale 22
+  name "rock_cluster_2"
+}
+Rock {
+  translation 26 5 0
+  scale 11
+  name "rock_cluster_3"
+}
+Rock {
+  translation 35 -3 0
+  scale 19
+  name "rock_cluster_4"
+}
+Rock {
+  translation 1 -4 0
+  scale 13
+  name "rock_6"
+}
+Rock {
+  translation 9 -6 0
+  scale 25
+  name "rock_7"
+}
+Rock {
+  translation 19 -2 0
+  scale 17
+  name "rock_8"
+}
+Rock {
+  translation 31 8 0
+  scale 24
+  name "rock_9"
+}
+Rock {
+  translation 39 1 0
+  scale 10
+  name "rock_10"
+}
+Rock {
+  translation 43 -6 0
+  scale 21
+  name "rock_11"
+}
+Rock {
+  translation 21 -9 0
+  scale 15
+  name "rock_cluster_5"
+}
+Rock {
+  translation 36 10 0
+  scale 18
+  name "rock_cluster_6"
+}
+Rock {
+  translation 41 4 0
+  scale 12
+  name "rock_cluster_7"
+}
+Rock {
+  translation 55 4 0
+  scale 16
+  name "rock_12"
+}
+Rock {
+  translation 68 -5 0
+  scale 23
+  name "rock_13"
+}
+Rock {
+  translation 82 3 0
+  scale 14
+  name "rock_14"
+}
+Rock {
+  translation 97 -8 0
+  scale 19
+  name "rock_15"
+}
+Rock {
+  translation 113 6 0
+  scale 11
+  name "rock_16"
+}
+Rock {
+  translation 128 -4 0
+  scale 20
+  name "rock_17"
+}
+Rock {
+  translation 145 9 0
+  scale 13
+  name "rock_18"
+}
+Rock {
+  translation 63 8 0
+  scale 22
+  name "rock_cluster_8"
+}
+Rock {
+  translation 89 -7 0
+  scale 17
+  name "rock_cluster_9"
+}
+Rock {
+  translation 116 2 0
+  scale 25
+  name "rock_cluster_10"
+}
+Rock {
+  translation 138 -9 0
+  scale 16
+  name "rock_cluster_11"
+}
+Mavic2Pro {
+  translation -1000 0 3.5
+  rotation 0 1 0 -0.05
+  name "drone"
+  controller "drone_animation"
+  supervisor TRUE
+  cameraSlot []
+}
