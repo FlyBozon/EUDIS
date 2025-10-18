@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <I2S.h>
+#include <Adafruit_NeoPixel.h>
 
 // I2S Pin Configuration for XIAO RP2040
 // WS (LRCLK) MUST be SCK + 1
@@ -12,8 +13,23 @@
 #define BITS_PER_SAMPLE 16     // 16-bit samples
 #define BUFFER_SIZE 512        // Number of samples per buffer
 
+// NeoPixel Configuration
+#define NEOPIXEL_PIN 12
+#define NUM_PIXELS 1
+
 I2S i2s(INPUT);
 int16_t audioBuffer[BUFFER_SIZE];
+Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+
+// Heartbeat variables
+unsigned long lastPingTime = 0;
+unsigned long lastPongTime = 0;
+const unsigned long PING_INTERVAL_MS = 250;
+
+// Loud sound detection variables
+unsigned long lastMaxReset = 0;
+float maxVolume = 0;
+unsigned long lastLoudTime = 0;
 
 void setup() {
   Serial.begin(921600);
@@ -42,6 +58,19 @@ void setup() {
   }
 
   Serial.println("I2S initialized successfully");
+
+  // Initialize UART for heartbeat
+  Serial1.begin(9600);
+
+  // Enable NeoPixel power
+  pinMode(11, OUTPUT);
+  digitalWrite(11, HIGH);
+
+  // Initialize NeoPixel
+  pixels.begin();
+  pixels.setPixelColor(0, pixels.Color(255, 0, 0)); // Red on start
+  pixels.show();
+
   Serial.print("Sample Rate: ");
   Serial.print(SAMPLE_RATE);
   Serial.println(" Hz");
@@ -61,11 +90,13 @@ void setup() {
   }
 }
 
-bool recording = true;
+bool recording = false;
 unsigned long samplesRead = 0;
 unsigned long lastStatusUpdate = 0;
 
 void loop() {
+  unsigned long currentTime = millis();
+
   // Check for serial commands
   if (Serial.available()) {
     char cmd = Serial.read();
@@ -110,8 +141,7 @@ void loop() {
         lastStatusUpdate = millis();
       }
 
-      /* Volume level debugging
-      // Calculate volume level RMS
+      // Volume level detection
       long sum = 0;
       for (int i = 0; i < samplesToRead; i++) {
         long sample = audioBuffer[i];
@@ -120,22 +150,49 @@ void loop() {
       float rms = sqrt(sum / samplesToRead);
       int volumeLevel = (int)rms;
 
-      if (millis() - lastStatusUpdate > 100) {
-        Serial.print("Available: ");
-        Serial.print(samplesAvailable);
-        Serial.print(" | Volume: ");
-        Serial.print(volumeLevel);
-        Serial.print(" | Raw[0]: ");
-        Serial.print(audioBuffer[0]);
-        Serial.print(" | Samples read: ");
-        Serial.println(samplesRead);
-
-        digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-        lastStatusUpdate = millis();
+      // Update max volume over last 5 seconds
+      if (currentTime - lastMaxReset > 5000) {
+        maxVolume = 0;
+        lastMaxReset = currentTime;
       }
-      */
+      if (volumeLevel > maxVolume) {
+        maxVolume = volumeLevel;
+      }
+
+      // If louder than 75% of max volume in last 5 seconds, send loud signal
+      if (volumeLevel > 0.75 * maxVolume && maxVolume > 0) {
+        Serial1.println("loud");
+      }
     }
   }
+
+  // Heartbeat UART communication
+  if (currentTime - lastPingTime > PING_INTERVAL_MS) {
+    Serial1.println("ping");
+    lastPingTime = currentTime;
+  }
+
+  if (Serial1.available()) {
+    String msg = Serial1.readStringUntil('\n');
+    msg.trim();
+    if (msg == "ping") {
+      Serial1.println("pong");
+    } else if (msg == "pong") {
+      lastPongTime = currentTime;
+    } else if (msg == "loud") {
+      lastLoudTime = currentTime;
+    }
+  }
+
+  // Update NeoPixel color based on heartbeat and loud sound
+  if (currentTime - lastLoudTime < 5000) { // If loud signal received within last 5 seconds
+    pixels.setPixelColor(0, pixels.Color(0, 0, 255)); // Blue
+  } else if (currentTime - lastPongTime < 2000) { // If pong received within last 2 seconds
+    pixels.setPixelColor(0, pixels.Color(0, 255, 0)); // Green
+  } else {
+    pixels.setPixelColor(0, pixels.Color(255, 0, 0)); // Red
+  }
+  pixels.show();
 
   delay(1);
 }
