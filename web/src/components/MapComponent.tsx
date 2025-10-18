@@ -11,18 +11,21 @@ export const MapComponent = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Array<{ name: string; lat: number; lon: number }>>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [selectedResultIndex, setSelectedResultIndex] = useState(0);
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchAbortRef = useRef<AbortController | null>(null);
   
   const deploymentLines = useAppStore((state) => state.deploymentLines);
   const espNodes = useAppStore((state) => state.espNodes);
   const detections = useAppStore((state) => state.detections);
+  const dronePositions = useAppStore((state) => state.dronePositions);
   const missionStartPoint = useAppStore((state) => state.missionStartPoint);
   const missionEndPoint = useAppStore((state) => state.missionEndPoint);
   const setMissionStartPoint = useAppStore((state) => state.setMissionStartPoint);
   const setMissionEndPoint = useAppStore((state) => state.setMissionEndPoint);
   
-  const layerRefsRef = useRef<{ [key: string]: L.Polyline | L.CircleMarker | L.Marker }>({});
+  const layerRefsRef = useRef<{ [key: string]: L.Polyline | L.CircleMarker | L.Marker | L.Circle | L.DivIcon }>({});
 
   // Funkcja do wyszukiwania lokalizacji
   const handleSearch = async (query: string) => {
@@ -32,6 +35,7 @@ export const MapComponent = () => {
     if (query.length < 2) {
       setSearchResults([]);
       setShowSearchResults(false);
+      setSelectedResultIndex(0);
       return;
     }
 
@@ -45,12 +49,22 @@ export const MapComponent = () => {
         searchAbortRef.current = controller;
 
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=pl&limit=5`,
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=pl&limit=10`,
           { signal: controller.signal }
         );
         const data = await response.json();
-        setSearchResults(data);
+        
+        // Usuń duplikaty (te same koordynaty) - często są 2 źródła w OSM
+        const uniqueResults = data.filter((item: any, index: number, self: any[]) => 
+          index === self.findIndex((t) => 
+            Math.abs(parseFloat(t.lat) - parseFloat(item.lat)) < 0.0001 && 
+            Math.abs(parseFloat(t.lon) - parseFloat(item.lon)) < 0.0001
+          )
+        ).slice(0, 5); // Ogranicz do 5 po usunięciu duplikatów
+        
+        setSearchResults(uniqueResults);
         setShowSearchResults(true);
+        setSelectedResultIndex(0); // Automatycznie zaznacz pierwszy wynik
       } catch (error) {
         if ((error as any)?.name !== 'AbortError') {
           console.error('Search failed:', error);
@@ -79,6 +93,35 @@ export const MapComponent = () => {
       setSearchQuery('');
       setShowSearchResults(false);
       setSearchResults([]);
+      setSelectedResultIndex(0);
+    }
+  };
+
+  // Obsługa klawiatury dla wyników wyszukiwania
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSearchResults || searchResults.length === 0) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedResultIndex((prev) => (prev + 1) % searchResults.length);
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedResultIndex((prev) => (prev - 1 + searchResults.length) % searchResults.length);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        const selected = searchResults[selectedResultIndex];
+        if (selected) {
+          handleLocationSelect(Number(selected.lat), Number(selected.lon));
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setShowSearchResults(false);
+        setSelectedResultIndex(0);
+        break;
     }
   };
 
@@ -203,6 +246,49 @@ export const MapComponent = () => {
       layerRefsRef.current[`mission-line`] = line;
     }
 
+    // Draw all drone positions
+    dronePositions.forEach((position, index) => {
+      // Zasięg wykrywania (400m)
+      const detectionRangeCircle = L.circle(position, {
+        radius: 400,
+        fillColor: '#8b5cf6',
+        color: '#7c3aed',
+        weight: 1,
+        opacity: 0.2,
+        fillOpacity: 0.05,
+      }).addTo(mapRef.current!);
+      layerRefsRef.current[`drone-range-${index}`] = detectionRangeCircle;
+
+      // Ikona drona
+      const droneMarker = L.marker(position, {
+        icon: L.divIcon({
+          className: 'drone-marker',
+          html: `<div style="
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            border: 2px solid white;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.6);
+            position: relative;
+            animation: pulse-drone-${index} 2s ease-in-out infinite;
+          "></div>
+          <style>
+            @keyframes pulse-drone-${index} {
+              0%, 100% { transform: scale(1); opacity: 1; }
+              50% { transform: scale(1.2); opacity: 0.8; }
+            }
+          </style>`,
+          iconSize: [16, 16],
+          iconAnchor: [8, 8],
+        }),
+        zIndexOffset: 1000,
+      }).addTo(mapRef.current!);
+      
+      droneMarker.bindPopup(`🚁 Dron #${index + 1}<br/>Zasięg: 400m`);
+      layerRefsRef.current[`drone-marker-${index}`] = droneMarker;
+    });
+
     // Update cursor based on selection mode
     if (mapRef.current) {
       if (isSelectingMode) {
@@ -213,7 +299,7 @@ export const MapComponent = () => {
         mapRef.current.getContainer().style.cursor = 'grab';
       }
     }
-  }, [deploymentLines, espNodes, detections, missionStartPoint, missionEndPoint, isSelectingMode, selectionStep]);
+  }, [deploymentLines, espNodes, detections, dronePositions, missionStartPoint, missionEndPoint, isSelectingMode, selectionStep]);
 
   // Handle map clicks for mission planning
   useEffect(() => {
@@ -239,6 +325,48 @@ export const MapComponent = () => {
     };
   }, [isSelectingMode, selectionStep]);
 
+  // Fullscreen handler
+  const toggleFullscreen = () => {
+    const mapContainer = containerRef.current?.parentElement;
+    if (!mapContainer) return;
+
+    if (!document.fullscreenElement) {
+      mapContainer.requestFullscreen().then(() => {
+        setIsFullscreen(true);
+        // Wymuszenie ponownego renderowania mapy po zmianie rozmiaru
+        setTimeout(() => {
+          mapRef.current?.invalidateSize();
+        }, 100);
+      }).catch((err) => {
+        console.error('Nie udało się włączyć fullscreen:', err);
+      });
+    } else {
+      document.exitFullscreen().then(() => {
+        setIsFullscreen(false);
+        // Wymuszenie ponownego renderowania mapy po zmianie rozmiaru
+        setTimeout(() => {
+          mapRef.current?.invalidateSize();
+        }, 100);
+      });
+    }
+  };
+
+  // Nasłuchiwanie na zmiany fullscreen (np. gdy użytkownik wciśnie ESC)
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+      // Wymuszenie ponownego renderowania mapy
+      setTimeout(() => {
+        mapRef.current?.invalidateSize();
+      }, 100);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
   return (
     <div className="relative w-full h-full">
       <div
@@ -259,6 +387,7 @@ export const MapComponent = () => {
                 setSearchQuery(value);
                 handleSearch(value);
               }}
+              onKeyDown={handleSearchKeyDown}
               onFocus={() => searchResults.length > 0 && setShowSearchResults(true)}
               className="flex-1 bg-transparent outline-none text-sm placeholder:text-muted-foreground"
             />
@@ -268,6 +397,7 @@ export const MapComponent = () => {
                   setSearchQuery('');
                   setSearchResults([]);
                   setShowSearchResults(false);
+                  setSelectedResultIndex(0);
                 }}
                 className="text-muted-foreground hover:text-foreground"
                 aria-label="Wyczyść"
@@ -276,6 +406,24 @@ export const MapComponent = () => {
               </button>
             )}
           </div>
+          
+          {/* Fullscreen Button */}
+          <button
+            onClick={toggleFullscreen}
+            className="absolute -right-14 top-0 p-2 bg-card border border-border rounded-lg shadow-lg hover:bg-accent transition-colors"
+            aria-label={isFullscreen ? 'Wyjdź z pełnego ekranu' : 'Pełny ekran'}
+            title={isFullscreen ? 'Wyjdź z pełnego ekranu (ESC)' : 'Pełny ekran'}
+          >
+            {isFullscreen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+              </svg>
+            )}
+          </button>
 
           {/* Search Results Dropdown */}
           {showSearchResults && searchResults.length > 0 && (
@@ -284,14 +432,21 @@ export const MapComponent = () => {
                 <button
                   key={index}
                   onClick={() => handleLocationSelect(Number(result.lat), Number(result.lon))}
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-accent transition-colors border-b border-border last:border-b-0"
+                  className={`w-full px-4 py-2 text-left text-sm transition-colors border-b border-border last:border-b-0 ${
+                    index === selectedResultIndex 
+                      ? 'bg-accent font-medium' 
+                      : 'hover:bg-accent/50'
+                  }`}
                 >
-                  <div className="font-medium truncate">{result.name}</div>
+                  <div className="truncate">{result.name}</div>
                   <div className="text-xs text-muted-foreground">
-                    {result.lat}, {result.lon}
+                    {Number(result.lat).toFixed(4)}, {Number(result.lon).toFixed(4)}
                   </div>
                 </button>
               ))}
+              <div className="px-4 py-1 text-xs text-muted-foreground bg-muted/30 border-t border-border">
+                ↑↓ Nawiguj | Enter Wybierz | Esc Zamknij
+              </div>
             </div>
           )}
 
