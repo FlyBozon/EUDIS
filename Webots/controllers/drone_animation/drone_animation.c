@@ -9,7 +9,7 @@
 #define START_X -5.0
 #define END_X 1000.0
 #define BASE_ALTITUDE 7.5
-#define DRONE_SPEED 6.25
+#define DRONE_SPEED 10.25
 #define BALL_DROP_INTERVAL 100.0
 #define MAX_BALLS 15
 
@@ -163,45 +163,28 @@ int main(int argc, char **argv) {
         };
         wb_supervisor_field_set_sf_rotation(rotation_field, new_rotation);
 
-        // Ball spawning logic - drop a ball every 100m
+        // CaseDeploy spawning logic - drop a case every 100m
         if (distance_traveled >= next_drop_distance && ball_count < MAX_BALLS) {
-            char ball_def[64];
-            snprintf(ball_def, sizeof(ball_def), "BALL_%d", ball_count + 1);
+            char case_def[64];
+            snprintf(case_def, sizeof(case_def), "CASE_%d", ball_count + 1);
 
-            char ball_string[512];
-            snprintf(ball_string, sizeof(ball_string),
-                "DEF %s Solid {\n"
+            char case_string[256];
+            snprintf(case_string, sizeof(case_string),
+                "DEF %s CaseDeploy {\n"
                 "  translation %.2f %.2f %.2f\n"
-                "  children [\n"
-                "    Shape {\n"
-                "      appearance PBRAppearance {\n"
-                "        baseColor 1 0 0\n"
-                "        metalness 0\n"
-                "        roughness 0.5\n"
-                "      }\n"
-                "      geometry Sphere {\n"
-                "        radius 0.3\n"
-                "      }\n"
-                "    }\n"
-                "  ]\n"
-                "  boundingObject Sphere {\n"
-                "    radius 0.3\n"
-                "  }\n"
-                "  physics Physics {\n"
-                "    density 500\n"
-                "    bounce 0.5\n"
-                "  }\n"
+                "  mass 2.0\n"
+                "  hitboxRadius 0.3\n"
                 "}\n",
-                ball_def, x, y, z);
+                case_def, x, y, z);
 
             WbNodeRef root = wb_supervisor_node_get_root();
             WbFieldRef children = wb_supervisor_node_get_field(root, "children");
-            wb_supervisor_field_import_mf_node_from_string(children, -1, ball_string);
+            wb_supervisor_field_import_mf_node_from_string(children, -1, case_string);
 
-            last_ball = wb_supervisor_node_get_from_def(ball_def);
+            last_ball = wb_supervisor_node_get_from_def(case_def);
             ball_count++;
 
-            printf("Ball dropped at X=%.1f! (Ball %d/%d)\n", x, ball_count, MAX_BALLS);
+            printf("CaseDeploy dropped at X=%.1f! (Case %d/%d)\n", x, ball_count, MAX_BALLS);
             next_drop_distance += BALL_DROP_INTERVAL;
         }
 
@@ -282,24 +265,21 @@ int main(int argc, char **argv) {
             wb_supervisor_field_set_sf_rotation(main_rot, front_orient);
 
         } else if (current_view == 4 && vp_main && last_ball) {
-            // Ball follow camera - follows the last dropped ball
             WbFieldRef ball_trans_field = wb_supervisor_node_get_field(last_ball, "translation");
             const double *ball_pos = wb_supervisor_field_get_sf_vec3f(ball_trans_field);
 
             WbFieldRef main_trans = wb_supervisor_node_get_field(vp_main, "position");
             WbFieldRef main_rot = wb_supervisor_node_get_field(vp_main, "orientation");
 
-            double cam_shake_x = multiOctaveNoise(elapsed + 900.0, 2.4, 0.03, 2);
-            double cam_shake_y = multiOctaveNoise(elapsed + 1000.0, 2.7, 0.03, 2);
-            double cam_shake_z = multiOctaveNoise(elapsed + 1100.0, 2.9, 0.02, 2);
-
+            // Camera position: behind and above the case, no shake
             const double ball_cam_pos[3] = {
-                ball_pos[0] - 3.0 + cam_shake_x,
-                ball_pos[1] - 2.5 + cam_shake_y,
-                ball_pos[2] + 1.5 + cam_shake_z
+                ball_pos[0] - 0.3,
+                ball_pos[1] - 0.25,
+                ball_pos[2] + 0.15
             };
             wb_supervisor_field_set_sf_vec3f(main_trans, ball_cam_pos);
 
+            // Calculate direction vector to the case
             double dx_ball = ball_pos[0] - ball_cam_pos[0];
             double dy_ball = ball_pos[1] - ball_cam_pos[1];
             double dz_ball = ball_pos[2] - ball_cam_pos[2];
@@ -309,10 +289,19 @@ int main(int argc, char **argv) {
             dy_ball /= dist_ball;
             dz_ball /= dist_ball;
 
+            // Calculate yaw (horizontal angle)
             double yaw_angle = atan2(dy_ball, dx_ball);
 
+            // Add 20 degree downward tilt (pitch)
+            double pitch_angle = atan2(-dz_ball, sqrt(dx_ball*dx_ball + dy_ball*dy_ball));
+            pitch_angle -= 20.0 * M_PI / 180.0;  // Add 20° downward tilt
+
+            // Combine yaw and pitch using axis-angle rotation
             const double ball_orient[4] = {
-                0.0, 0.0, 1.0, yaw_angle
+                -sin(pitch_angle) * sin(yaw_angle),
+                sin(pitch_angle) * cos(yaw_angle),
+                cos(pitch_angle),
+                yaw_angle
             };
             wb_supervisor_field_set_sf_rotation(main_rot, ball_orient);
         }

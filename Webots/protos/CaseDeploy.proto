@@ -1,0 +1,44 @@
+#VRML_SIM R2025a utf8
+# CaseDeploy - Deployable case dropped from drone
+# Uses custom STL mesh with sphere hitbox
+# STL file is in millimeters - scaled down 1000x to meters
+
+PROTO CaseDeploy [
+  field SFVec3f    translation  0 0 0
+  field SFRotation rotation     0 0 1 0
+  field SFString   name         "case_deploy"
+  field SFFloat    mass         2.0
+  field SFFloat    hitboxRadius 0.3
+]
+{
+  Solid {
+    translation IS translation
+    rotation IS rotation
+    name IS name
+    children [
+      Transform {
+        scale 0.001 0.001 0.001
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 1 0 0
+              metalness 0.3
+              roughness 0.7
+            }
+            geometry Mesh {
+              url "meshes/CaseDeploy.stl"
+            }
+            castShadows FALSE
+          }
+        ]
+      }
+    ]
+    boundingObject Sphere {
+      radius IS hitboxRadius
+    }
+    physics Physics {
+      density -1
+      mass IS mass
+    }
+  }
+}
