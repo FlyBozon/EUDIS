@@ -4,30 +4,34 @@ output/
 data/
 DroneAudioDataset/
 detections/
+
+# === Project-specific ===
+# Venv and data
+venv/
+output/
+data/
+DroneAudioDataset/
+detections/
 *.pth
 urban-sound-8k
 *.zip
 *.pkl
-<<<<<<< HEAD
+
+# Project generated / temp
 template_visualization/
-*.png
-*.jpg
-*.wav
-*.save
 remove_from_view/
 template/
-=======
 __pycache__/**
 
->>>>>>> 024659f6f09f382e209c72029617bf6fd720734f
-
-# Microcontroller
-Microcontroller/.pio
-Microcontroller/.vscode/.browse.c_cpp.db*
-Microcontroller/.vscode/c_cpp_properties.json
-Microcontroller/.vscode/launch.json
-Microcontroller/.vscode/ipch
-Microcontroller/private/
+# === PlatformIO ===
+.pio
+.platformio
+.vscode/.browse.c_cpp.db*
+.vscode/c_cpp_properties.json
+.vscode/launch.json
+.vscode/ipch
+.vscode/settings.json
+private/
 
 # Logs
 logs

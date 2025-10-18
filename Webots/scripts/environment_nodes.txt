@@ -1,0 +1,1906 @@
+# Generated Pine Trees
+# Copy these nodes into your Webots world file
+
+Pine {
+  translation 639.4 -38.0 0
+  rotation 0 0 1 4.1
+  name "pine_1"
+}
+Pine {
+  translation 275.0 -22.1 0
+  rotation 0 0 1 1.9
+  name "pine_2"
+}
+Pine {
+  translation 736.5 14.1 0
+  rotation 0 0 1 2.8
+  name "pine_3"
+}
+Pine {
+  translation 892.2 -33.0 0
+  rotation 0 0 1 3.6
+  name "pine_4"
+}
+Pine {
+  translation 421.9 -37.6 0
+  rotation 0 0 1 4.6
+  name "pine_5"
+}
+Pine {
+  translation 218.6 0.4 0
+  rotation 0 0 1 0.6
+  name "pine_6"
+}
+Pine {
+  translation 26.5 -24.1 0
+  rotation 0 0 1 1.9
+  name "pine_7"
+}
+Pine {
+  translation 649.9 3.6 0
+  rotation 0 0 1 4.7
+  name "pine_8"
+}
+Pine {
+  translation 809.4 -39.5 0
+  rotation 0 0 1 1.1
+  name "pine_9"
+}
+Pine {
+  translation 805.8 15.9 0
+  rotation 0 0 1 0.8
+  name "pine_10"
+}
+Pine {
+  translation 340.3 -27.6 0
+  rotation 0 0 1 3.4
+  name "pine_11"
+}
+Pine {
+  translation 957.2 -13.1 0
+  rotation 0 0 1 6.1
+  name "pine_12"
+}
+Pine {
+  translation 92.7 -32.3 0
+  rotation 0 0 1 3.3
+  name "pine_13"
+}
+Pine {
+  translation 847.5 8.3 0
+  rotation 0 0 1 5.7
+  name "pine_14"
+}
+Pine {
+  translation 536.2 37.8 0
+  rotation 0 0 1 5.2
+  name "pine_15"
+}
+Pine {
+  translation 378.5 4.2 0
+  rotation 0 0 1 1.6
+  name "pine_16"
+}
+Pine {
+  translation 829.4 9.5 0
+  rotation 0 0 1 5.2
+  name "pine_17"
+}
+Pine {
+  translation 861.7 6.2 0
+  rotation 0 0 1 3.0
+  name "pine_18"
+}
+Pine {
+  translation 704.6 -36.3 0
+  rotation 0 0 1 5.1
+  name "pine_19"
+}
+Pine {
+  translation 227.9 -16.8 0
+  rotation 0 0 1 4.7
+  name "pine_20"
+}
+Pine {
+  translation 79.8 -21.4 0
+  rotation 0 0 1 2.1
+  name "pine_21"
+}
+Pine {
+  translation 101.0 -17.8 0
+  rotation 0 0 1 0.7
+  name "pine_22"
+}
+Pine {
+  translation 635.7 -10.8 0
+  rotation 0 0 1 6.1
+  name "pine_23"
+}
+Pine {
+  translation 370.2 -23.2 0
+  rotation 0 0 1 0.9
+  name "pine_24"
+}
+Pine {
+  translation 267.0 34.9 0
+  rotation 0 0 1 6.1
+  name "pine_25"
+}
+Pine {
+  translation 171.1 18.3 0
+  rotation 0 0 1 5.4
+  name "pine_26"
+}
+Pine {
+  translation 163.4 -9.6 0
+  rotation 0 0 1 4.6
+  name "pine_27"
+}
+Pine {
+  translation 989.5 11.2 0
+  rotation 0 0 1 6.2
+  name "pine_28"
+}
+Pine {
+  translation 556.9 14.8 0
+  rotation 0 0 1 6.1
+  name "pine_29"
+}
+Pine {
+  translation 842.9 22.1 0
+  rotation 0 0 1 5.1
+  name "pine_30"
+}
+Pine {
+  translation 229.0 -37.4 0
+  rotation 0 0 1 2.3
+  name "pine_31"
+}
+Pine {
+  translation 315.5 -18.6 0
+  rotation 0 0 1 5.0
+  name "pine_32"
+}
+Pine {
+  translation 211.0 35.4 0
+  rotation 0 0 1 0.1
+  name "pine_33"
+}
+Pine {
+  translation 876.4 -14.8 0
+  rotation 0 0 1 3.4
+  name "pine_34"
+}
+Pine {
+  translation 655.4 -8.3 0
+  rotation 0 0 1 2.9
+  name "pine_35"
+}
+Pine {
+  translation 914.5 -3.3 0
+  rotation 0 0 1 4.2
+  name "pine_36"
+}
+Pine {
+  translation 264.9 -20.3 0
+  rotation 0 0 1 4.2
+  name "pine_37"
+}
+Pine {
+  translation 561.4 -19.0 0
+  rotation 0 0 1 3.7
+  name "pine_38"
+}
+Pine {
+  translation 584.6 31.8 0
+  rotation 0 0 1 5.2
+  name "pine_39"
+}
+Pine {
+  translation 399.4 -22.5 0
+  rotation 0 0 1 5.9
+  name "pine_40"
+}
+Pine {
+  translation 997.5 0.8 0
+  rotation 0 0 1 0.7
+  name "pine_41"
+}
+Pine {
+  translation 109.6 10.2 0
+  rotation 0 0 1 1.5
+  name "pine_42"
+}
+Pine {
+  translation 792.1 -6.2 0
+  rotation 0 0 1 0.2
+  name "pine_43"
+}
+Pine {
+  translation 63.5 -9.5 0
+  rotation 0 0 1 5.6
+  name "pine_44"
+}
+Pine {
+  translation 971.1 28.9 0
+  rotation 0 0 1 3.5
+  name "pine_45"
+}
+Pine {
+  translation 11.5 17.7 0
+  rotation 0 0 1 5.8
+  name "pine_46"
+}
+Pine {
+  translation 681.7 3.0 0
+  rotation 0 0 1 1.4
+  name "pine_47"
+}
+Pine {
+  translation 266.8 11.3 0
+  rotation 0 0 1 0.4
+  name "pine_48"
+}
+Pine {
+  translation 111.6 -5.2 0
+  rotation 0 0 1 5.2
+  name "pine_49"
+}
+Pine {
+  translation 453.7 36.3 0
+  rotation 0 0 1 5.7
+  name "pine_50"
+}
+Pine {
+  translation 500.6 -25.7 0
+  rotation 0 0 1 1.9
+  name "pine_51"
+}
+Pine {
+  translation 912.6 29.6 0
+  rotation 0 0 1 2.6
+  name "pine_52"
+}
+Pine {
+  translation 298.4 11.1 0
+  rotation 0 0 1 0.9
+  name "pine_53"
+}
+Pine {
+  translation 609.0 -27.8 0
+  rotation 0 0 1 5.9
+  name "pine_54"
+}
+Pine {
+  translation 762.5 3.2 0
+  rotation 0 0 1 1.9
+  name "pine_55"
+}
+Pine {
+  translation 778.6 2.4 0
+  rotation 0 0 1 3.1
+  name "pine_56"
+}
+Pine {
+  translation 0.6 -14.1 0
+  rotation 0 0 1 0.6
+  name "pine_57"
+}
+Pine {
+  translation 19.5 34.3 0
+  rotation 0 0 1 5.6
+  name "pine_58"
+}
+Pine {
+  translation 878.7 26.5 0
+  rotation 0 0 1 0.9
+  name "pine_59"
+}
+Pine {
+  translation 307.5 -35.4 0
+  rotation 0 0 1 2.9
+  name "pine_60"
+}
+Pine {
+  translation 878.0 35.8 0
+  rotation 0 0 1 4.2
+  name "pine_61"
+}
+Pine {
+  translation 85.7 -1.1 0
+  rotation 0 0 1 4.7
+  name "pine_62"
+}
+Pine {
+  translation 69.2 20.8 0
+  rotation 0 0 1 5.9
+  name "pine_63"
+}
+Pine {
+  translation 765.8 -29.7 0
+  rotation 0 0 1 2.6
+  name "pine_64"
+}
+Pine {
+  translation 475.3 4.0 0
+  rotation 0 0 1 4.7
+  name "pine_65"
+}
+Pine {
+  translation 423.1 -23.1 0
+  rotation 0 0 1 1.0
+  name "pine_66"
+}
+Pine {
+  translation 539.3 18.4 0
+  rotation 0 0 1 2.6
+  name "pine_67"
+}
+Pine {
+  translation 201.2 -15.1 0
+  rotation 0 0 1 0.6
+  name "pine_68"
+}
+Pine {
+  translation 438.1 1.4 0
+  rotation 0 0 1 3.1
+  name "pine_69"
+}
+Pine {
+  translation 121.0 -22.0 0
+  rotation 0 0 1 2.6
+  name "pine_70"
+}
+Pine {
+  translation 338.1 7.1 0
+  rotation 0 0 1 6.0
+  name "pine_71"
+}
+Pine {
+  translation 71.0 10.5 0
+  rotation 0 0 1 0.2
+  name "pine_72"
+}
+Pine {
+  translation 228.9 32.4 0
+  rotation 0 0 1 2.3
+  name "pine_73"
+}
+Pine {
+  translation 859.6 -34.3 0
+  rotation 0 0 1 2.8
+  name "pine_74"
+}
+Pine {
+  translation 238.0 13.5 0
+  rotation 0 0 1 6.0
+  name "pine_75"
+}
+Pine {
+  translation 214.2 -29.4 0
+  rotation 0 0 1 5.4
+  name "pine_76"
+}
+Pine {
+  translation 935.5 5.7 0
+  rotation 0 0 1 0.6
+  name "pine_77"
+}
+Pine {
+  translation 472.7 22.8 0
+  rotation 0 0 1 4.3
+  name "pine_78"
+}
+Pine {
+  translation 807.5 -24.8 0
+  rotation 0 0 1 3.4
+  name "pine_79"
+}
+Pine {
+  translation 96.9 -5.5 0
+  rotation 0 0 1 6.1
+  name "pine_80"
+}
+Pine {
+  translation 423.6 -2.6 0
+  rotation 0 0 1 2.3
+  name "pine_81"
+}
+Pine {
+  translation 984.2 -32.1 0
+  rotation 0 0 1 2.5
+  name "pine_82"
+}
+Pine {
+  translation 402.6 -12.9 0
+  rotation 0 0 1 1.2
+  name "pine_83"
+}
+Pine {
+  translation 861.7 -20.1 0
+  rotation 0 0 1 0.8
+  name "pine_84"
+}
+Pine {
+  translation 190.2 -4.1 0
+  rotation 0 0 1 5.3
+  name "pine_85"
+}
+Pine {
+  translation 249.8 33.9 0
+  rotation 0 0 1 2.9
+  name "pine_86"
+}
+Pine {
+  translation 443.1 28.9 0
+  rotation 0 0 1 4.2
+  name "pine_87"
+}
+Pine {
+  translation 550.3 -36.0 0
+  rotation 0 0 1 4.0
+  name "pine_88"
+}
+Pine {
+  translation 999.3 26.9 0
+  rotation 0 0 1 3.8
+  name "pine_89"
+}
+Pine {
+  translation 848.7 -26.7 0
+  rotation 0 0 1 0.1
+  name "pine_90"
+}
+Pine {
+  translation 485.6 -22.9 0
+  rotation 0 0 1 4.9
+  name "pine_91"
+}
+Pine {
+  translation 401.0 -35.3 0
+  rotation 0 0 1 1.5
+  name "pine_92"
+}
+Pine {
+  translation 379.0 38.8 0
+  rotation 0 0 1 0.8
+  name "pine_93"
+}
+Pine {
+  translation 265.2 22.7 0
+  rotation 0 0 1 3.5
+  name "pine_94"
+}
+Pine {
+  translation 455.0 -6.2 0
+  rotation 0 0 1 0.4
+  name "pine_95"
+}
+Pine {
+  translation 957.3 39.6 0
+  rotation 0 0 1 4.8
+  name "pine_96"
+}
+Pine {
+  translation 154.8 -16.3 0
+  rotation 0 0 1 1.3
+  name "pine_97"
+}
+Pine {
+  translation 968.7 6.3 0
+  rotation 0 0 1 1.4
+  name "pine_98"
+}
+Pine {
+  translation 57.2 6.7 0
+  rotation 0 0 1 5.5
+  name "pine_99"
+}
+Pine {
+  translation 502.9 28.2 0
+  rotation 0 0 1 2.1
+  name "pine_100"
+}
+Pine {
+  translation 157.4 36.9 0
+  rotation 0 0 1 0.9
+  name "pine_101"
+}
+Pine {
+  translation 595.0 14.0 0
+  rotation 0 0 1 5.7
+  name "pine_102"
+}
+Pine {
+  translation 235.2 -30.4 0
+  rotation 0 0 1 0.0
+  name "pine_103"
+}
+Pine {
+  translation 890.3 -20.3 0
+  rotation 0 0 1 5.4
+  name "pine_104"
+}
+Pine {
+  translation 419.2 6.7 0
+  rotation 0 0 1 0.9
+  name "pine_105"
+}
+Pine {
+  translation 522.8 34.8 0
+  rotation 0 0 1 0.8
+  name "pine_106"
+}
+Pine {
+  translation 204.3 17.3 0
+  rotation 0 0 1 1.6
+  name "pine_107"
+}
+Pine {
+  translation 238.7 -8.3 0
+  rotation 0 0 1 1.1
+  name "pine_108"
+}
+Pine {
+  translation 671.7 -16.0 0
+  rotation 0 0 1 4.2
+  name "pine_109"
+}
+Pine {
+  translation 316.2 20.1 0
+  rotation 0 0 1 0.2
+  name "pine_110"
+}
+Pine {
+  translation 72.5 -3.3 0
+  rotation 0 0 1 0.1
+  name "pine_111"
+}
+Pine {
+  translation 998.5 39.7 0
+  rotation 0 0 1 5.0
+  name "pine_112"
+}
+Pine {
+  translation 833.7 16.3 0
+  rotation 0 0 1 1.5
+  name "pine_113"
+}
+Pine {
+  translation 611.7 39.0 0
+  rotation 0 0 1 2.0
+  name "pine_114"
+}
+Pine {
+  translation 654.0 -39.4 0
+  rotation 0 0 1 1.1
+  name "pine_115"
+}
+Pine {
+  translation 817.1 -16.0 0
+  rotation 0 0 1 0.3
+  name "pine_116"
+}
+Pine {
+  translation 663.4 35.1 0
+  rotation 0 0 1 4.7
+  name "pine_117"
+}
+Pine {
+  translation 134.3 -30.8 0
+  rotation 0 0 1 3.3
+  name "pine_118"
+}
+Pine {
+  translation 717.6 -23.7 0
+  rotation 0 0 1 4.7
+  name "pine_119"
+}
+Pine {
+  translation 634.2 -18.9 0
+  rotation 0 0 1 3.0
+  name "pine_120"
+}
+Pine {
+  translation 488.5 32.4 0
+  rotation 0 0 1 4.9
+  name "pine_121"
+}
+Pine {
+  translation 3.5 21.7 0
+  rotation 0 0 1 3.2
+  name "pine_122"
+}
+Pine {
+  translation 741.2 4.1 0
+  rotation 0 0 1 0.7
+  name "pine_123"
+}
+Pine {
+  translation 75.2 30.6 0
+  rotation 0 0 1 3.2
+  name "pine_124"
+}
+Pine {
+  translation 903.9 3.6 0
+  rotation 0 0 1 5.9
+  name "pine_125"
+}
+Pine {
+  translation 148.1 -29.8 0
+  rotation 0 0 1 0.3
+  name "pine_126"
+}
+Pine {
+  translation 308.3 31.9 0
+  rotation 0 0 1 4.9
+  name "pine_127"
+}
+Pine {
+  translation 796.1 28.9 0
+  rotation 0 0 1 5.4
+  name "pine_128"
+}
+Pine {
+  translation 898.9 -23.2 0
+  rotation 0 0 1 3.3
+  name "pine_129"
+}
+Pine {
+  translation 249.5 -31.8 0
+  rotation 0 0 1 2.9
+  name "pine_130"
+}
+Pine {
+  translation 780.1 30.7 0
+  rotation 0 0 1 6.1
+  name "pine_131"
+}
+Pine {
+  translation 406.4 9.7 0
+  rotation 0 0 1 0.4
+  name "pine_132"
+}
+Pine {
+  translation 864.6 38.1 0
+  rotation 0 0 1 3.0
+  name "pine_133"
+}
+Pine {
+  translation 810.8 30.5 0
+  rotation 0 0 1 2.5
+  name "pine_134"
+}
+Pine {
+  translation 24.8 18.9 0
+  rotation 0 0 1 4.3
+  name "pine_135"
+}
+Pine {
+  translation 332.2 34.5 0
+  rotation 0 0 1 3.1
+  name "pine_136"
+}
+Pine {
+  translation 787.4 -31.4 0
+  rotation 0 0 1 5.7
+  name "pine_137"
+}
+Pine {
+  translation 222.4 25.3 0
+  rotation 0 0 1 0.5
+  name "pine_138"
+}
+Pine {
+  translation 460.3 -15.6 0
+  rotation 0 0 1 0.5
+  name "pine_139"
+}
+Pine {
+  translation 795.3 -21.8 0
+  rotation 0 0 1 3.8
+  name "pine_140"
+}
+Pine {
+  translation 966.9 -17.7 0
+  rotation 0 0 1 0.4
+  name "pine_141"
+}
+Pine {
+  translation 981.1 2.9 0
+  rotation 0 0 1 1.7
+  name "pine_142"
+}
+Pine {
+  translation 939.2 -30.8 0
+  rotation 0 0 1 4.0
+  name "pine_143"
+}
+Pine {
+  translation 970.4 -25.7 0
+  rotation 0 0 1 3.4
+  name "pine_144"
+}
+Pine {
+  translation 728.5 -14.9 0
+  rotation 0 0 1 2.0
+  name "pine_145"
+}
+Pine {
+  translation 606.2 0.9 0
+  rotation 0 0 1 6.2
+  name "pine_146"
+}
+Pine {
+  translation 254.7 16.7 0
+  rotation 0 0 1 3.3
+  name "pine_147"
+}
+Pine {
+  translation 1.7 34.0 0
+  rotation 0 0 1 2.9
+  name "pine_148"
+}
+Pine {
+  translation 364.2 -34.4 0
+  rotation 0 0 1 3.8
+  name "pine_149"
+}
+Pine {
+  translation 719.8 -16.0 0
+  rotation 0 0 1 0.6
+  name "pine_150"
+}
+Pine {
+  translation 309.3 -7.3 0
+  rotation 0 0 1 4.4
+  name "pine_151"
+}
+Pine {
+  translation 127.3 -6.4 0
+  rotation 0 0 1 5.4
+  name "pine_152"
+}
+Pine {
+  translation 940.4 14.2 0
+  rotation 0 0 1 4.1
+  name "pine_153"
+}
+Pine {
+  translation 429.9 6.4 0
+  rotation 0 0 1 4.8
+  name "pine_154"
+}
+Pine {
+  translation 442.2 -22.9 0
+  rotation 0 0 1 4.5
+  name "pine_155"
+}
+Pine {
+  translation 473.2 32.1 0
+  rotation 0 0 1 1.4
+  name "pine_156"
+}
+Pine {
+  translation 818.4 20.1 0
+  rotation 0 0 1 2.8
+  name "pine_157"
+}
+Pine {
+  translation 199.1 -38.0 0
+  rotation 0 0 1 1.4
+  name "pine_158"
+}
+Pine {
+  translation 244.8 -2.0 0
+  rotation 0 0 1 2.1
+  name "pine_159"
+}
+Pine {
+  translation 194.4 15.7 0
+  rotation 0 0 1 2.8
+  name "pine_160"
+}
+Pine {
+  translation 494.4 -20.5 0
+  rotation 0 0 1 2.6
+  name "pine_161"
+}
+Pine {
+  translation 751.0 21.6 0
+  rotation 0 0 1 0.6
+  name "pine_162"
+}
+Pine {
+  translation 175.9 36.6 0
+  rotation 0 0 1 2.7
+  name "pine_163"
+}
+Pine {
+  translation 518.0 -36.0 0
+  rotation 0 0 1 4.2
+  name "pine_164"
+}
+Pine {
+  translation 456.5 24.1 0
+  rotation 0 0 1 2.4
+  name "pine_165"
+}
+Pine {
+  translation 595.5 36.0 0
+  rotation 0 0 1 1.0
+  name "pine_166"
+}
+Pine {
+  translation 891.4 9.0 0
+  rotation 0 0 1 5.8
+  name "pine_167"
+}
+Pine {
+  translation 719.3 0.4 0
+  rotation 0 0 1 0.4
+  name "pine_168"
+}
+Pine {
+  translation 897.2 19.5 0
+  rotation 0 0 1 5.2
+  name "pine_169"
+}
+Pine {
+  translation 474.7 -19.3 0
+  rotation 0 0 1 0.6
+  name "pine_170"
+}
+Pine {
+  translation 247.2 11.0 0
+  rotation 0 0 1 0.6
+  name "pine_171"
+}
+Pine {
+  translation 271.7 -14.4 0
+  rotation 0 0 1 4.6
+  name "pine_172"
+}
+Pine {
+  translation 540.2 -28.9 0
+  rotation 0 0 1 5.1
+  name "pine_173"
+}
+Pine {
+  translation 420.1 32.4 0
+  rotation 0 0 1 3.5
+  name "pine_174"
+}
+Pine {
+  translation 584.1 15.6 0
+  rotation 0 0 1 3.7
+  name "pine_175"
+}
+Pine {
+  translation 856.7 21.2 0
+  rotation 0 0 1 3.5
+  name "pine_176"
+}
+Pine {
+  translation 380.4 -39.5 0
+  rotation 0 0 1 2.1
+  name "pine_177"
+}
+Pine {
+  translation 351.8 20.3 0
+  rotation 0 0 1 0.8
+  name "pine_178"
+}
+Pine {
+  translation 853.4 36.3 0
+  rotation 0 0 1 2.2
+  name "pine_179"
+}
+Pine {
+  translation 419.0 19.8 0
+  rotation 0 0 1 4.2
+  name "pine_180"
+}
+Pine {
+  translation 546.1 8.3 0
+  rotation 0 0 1 4.7
+  name "pine_181"
+}
+Pine {
+  translation 220.5 -22.4 0
+  rotation 0 0 1 5.5
+  name "pine_182"
+}
+Pine {
+  translation 435.8 -37.7 0
+  rotation 0 0 1 4.5
+  name "pine_183"
+}
+Pine {
+  translation 467.4 -29.8 0
+  rotation 0 0 1 6.1
+  name "pine_184"
+}
+Pine {
+  translation 622.3 -37.8 0
+  rotation 0 0 1 3.8
+  name "pine_185"
+}
+Pine {
+  translation 394.0 5.2 0
+  rotation 0 0 1 2.2
+  name "pine_186"
+}
+Pine {
+  translation 135.7 -3.1 0
+  rotation 0 0 1 3.6
+  name "pine_187"
+}
+Pine {
+  translation 50.3 -9.7 0
+  rotation 0 0 1 1.3
+  name "pine_188"
+}
+Pine {
+  translation 211.7 -13.9 0
+  rotation 0 0 1 4.1
+  name "pine_189"
+}
+Pine {
+  translation 761.2 -9.7 0
+  rotation 0 0 1 1.4
+  name "pine_190"
+}
+Pine {
+  translation 19.4 3.2 0
+  rotation 0 0 1 0.7
+  name "pine_191"
+}
+Pine {
+  translation 999.9 -12.0 0
+  rotation 0 0 1 5.3
+  name "pine_192"
+}
+Pine {
+  translation 650.1 22.5 0
+  rotation 0 0 1 2.3
+  name "pine_193"
+}
+Pine {
+  translation 949.6 -24.1 0
+  rotation 0 0 1 4.8
+  name "pine_194"
+}
+Pine {
+  translation 126.2 13.6 0
+  rotation 0 0 1 3.6
+  name "pine_195"
+}
+Pine {
+  translation 699.5 21.4 0
+  rotation 0 0 1 5.1
+  name "pine_196"
+}
+Pine {
+  translation 167.8 8.6 0
+  rotation 0 0 1 5.3
+  name "pine_197"
+}
+Pine {
+  translation 747.9 -30.8 0
+  rotation 0 0 1 6.1
+  name "pine_198"
+}
+Pine {
+  translation 819.3 37.2 0
+  rotation 0 0 1 5.1
+  name "pine_199"
+}
+Pine {
+  translation 108.1 -37.9 0
+  rotation 0 0 1 3.9
+  name "pine_200"
+}
+
+# Generated Rocks
+
+Rock {
+  translation 312.0 14.2 0
+  rotation 0 0 1 4.0
+  scale 8
+  name "rock_1"
+}
+Rock {
+  translation 715.0 -33.9 0
+  rotation 0 0 1 3.8
+  scale 29
+  name "rock_2"
+}
+Rock {
+  translation 690.6 10.2 0
+  rotation 0 0 1 5.2
+  scale 16
+  name "rock_3"
+}
+Rock {
+  translation 101.9 21.8 0
+  rotation 0 0 1 0.2
+  scale 16
+  name "rock_4"
+}
+Rock {
+  translation 121.1 38.7 0
+  rotation 0 0 1 4.4
+  scale 17
+  name "rock_5"
+}
+Rock {
+  translation 782.6 -12.2 0
+  rotation 0 0 1 5.8
+  scale 19
+  name "rock_6"
+}
+Rock {
+  translation 428.4 -10.4 0
+  rotation 0 0 1 0.0
+  scale 12
+  name "rock_7"
+}
+Rock {
+  translation 506.0 -12.7 0
+  rotation 0 0 1 3.6
+  scale 20
+  name "rock_8"
+}
+Rock {
+  translation 849.6 25.8 0
+  rotation 0 0 1 0.4
+  scale 28
+  name "rock_9"
+}
+Rock {
+  translation 105.5 36.9 0
+  rotation 0 0 1 6.1
+  scale 10
+  name "rock_10"
+}
+Rock {
+  translation 635.6 26.3 0
+  rotation 0 0 1 4.7
+  scale 14
+  name "rock_11"
+}
+Rock {
+  translation 707.3 -5.2 0
+  rotation 0 0 1 2.4
+  scale 22
+  name "rock_12"
+}
+Rock {
+  translation 733.8 37.2 0
+  rotation 0 0 1 2.1
+  scale 19
+  name "rock_13"
+}
+Rock {
+  translation 270.1 24.7 0
+  rotation 0 0 1 2.0
+  scale 18
+  name "rock_14"
+}
+Rock {
+  translation 538.2 -1.3 0
+  rotation 0 0 1 4.9
+  scale 26
+  name "rock_15"
+}
+Rock {
+  translation 435.6 18.5 0
+  rotation 0 0 1 3.7
+  scale 9
+  name "rock_16"
+}
+Rock {
+  translation 830.7 -33.1 0
+  rotation 0 0 1 1.0
+  scale 27
+  name "rock_17"
+}
+Rock {
+  translation 881.6 -20.5 0
+  rotation 0 0 1 0.3
+  scale 10
+  name "rock_18"
+}
+Rock {
+  translation 464.7 8.8 0
+  rotation 0 0 1 1.7
+  scale 29
+  name "rock_19"
+}
+Rock {
+  translation 212.1 23.8 0
+  rotation 0 0 1 2.7
+  scale 27
+  name "rock_20"
+}
+Rock {
+  translation 340.3 30.4 0
+  rotation 0 0 1 2.8
+  scale 16
+  name "rock_21"
+}
+Rock {
+  translation 701.2 -17.9 0
+  rotation 0 0 1 1.4
+  scale 24
+  name "rock_22"
+}
+Rock {
+  translation 10.2 35.8 0
+  rotation 0 0 1 0.7
+  scale 21
+  name "rock_23"
+}
+Rock {
+  translation 85.6 17.6 0
+  rotation 0 0 1 0.7
+  scale 29
+  name "rock_24"
+}
+Rock {
+  translation 488.6 20.7 0
+  rotation 0 0 1 4.3
+  scale 23
+  name "rock_25"
+}
+Rock {
+  translation 93.1 -22.3 0
+  rotation 0 0 1 3.3
+  scale 17
+  name "rock_26"
+}
+Rock {
+  translation 691.8 -15.5 0
+  rotation 0 0 1 0.3
+  scale 20
+  name "rock_27"
+}
+Rock {
+  translation 581.6 -2.1 0
+  rotation 0 0 1 6.2
+  scale 9
+  name "rock_28"
+}
+Rock {
+  translation 530.9 -6.0 0
+  rotation 0 0 1 0.0
+  scale 17
+  name "rock_29"
+}
+Rock {
+  translation 745.9 -13.5 0
+  rotation 0 0 1 5.9
+  scale 12
+  name "rock_30"
+}
+Rock {
+  translation 192.6 -30.4 0
+  rotation 0 0 1 4.8
+  scale 17
+  name "rock_31"
+}
+Rock {
+  translation 185.1 -22.7 0
+  rotation 0 0 1 2.1
+  scale 8
+  name "rock_32"
+}
+Rock {
+  translation 484.2 18.0 0
+  rotation 0 0 1 3.1
+  scale 21
+  name "rock_33"
+}
+Rock {
+  translation 283.0 -32.0 0
+  rotation 0 0 1 1.1
+  scale 20
+  name "rock_34"
+}
+Rock {
+  translation 194.1 -21.8 0
+  rotation 0 0 1 3.3
+  scale 15
+  name "rock_35"
+}
+Rock {
+  translation 179.4 -38.9 0
+  rotation 0 0 1 3.1
+  scale 29
+  name "rock_36"
+}
+Rock {
+  translation 534.1 -18.1 0
+  rotation 0 0 1 5.1
+  scale 10
+  name "rock_37"
+}
+Rock {
+  translation 974.3 4.3 0
+  rotation 0 0 1 2.5
+  scale 9
+  name "rock_38"
+}
+Rock {
+  translation 697.4 -29.9 0
+  rotation 0 0 1 2.7
+  scale 22
+  name "rock_39"
+}
+Rock {
+  translation 868.5 -0.7 0
+  rotation 0 0 1 5.8
+  scale 18
+  name "rock_40"
+}
+Rock {
+  translation 872.7 5.9 0
+  rotation 0 0 1 3.6
+  scale 26
+  name "rock_41"
+}
+Rock {
+  translation 469.4 -4.8 0
+  rotation 0 0 1 2.5
+  scale 28
+  name "rock_42"
+}
+Rock {
+  translation 184.4 -35.9 0
+  rotation 0 0 1 2.6
+  scale 11
+  name "rock_43"
+}
+Rock {
+  translation 941.1 -1.8 0
+  rotation 0 0 1 2.5
+  scale 18
+  name "rock_44"
+}
+Rock {
+  translation 822.1 -7.9 0
+  rotation 0 0 1 1.1
+  scale 27
+  name "rock_45"
+}
+Rock {
+  translation 53.6 -28.1 0
+  rotation 0 0 1 2.9
+  scale 30
+  name "rock_46"
+}
+Rock {
+  translation 993.9 -30.5 0
+  rotation 0 0 1 5.8
+  scale 10
+  name "rock_47"
+}
+Rock {
+  translation 764.4 8.5 0
+  rotation 0 0 1 2.7
+  scale 11
+  name "rock_48"
+}
+Rock {
+  translation 522.6 -4.0 0
+  rotation 0 0 1 1.5
+  scale 26
+  name "rock_49"
+}
+Rock {
+  translation 990.0 -15.6 0
+  rotation 0 0 1 2.5
+  scale 10
+  name "rock_50"
+}
+Rock {
+  translation 621.0 8.8 0
+  rotation 0 0 1 2.5
+  scale 17
+  name "rock_51"
+}
+Rock {
+  translation 740.1 35.8 0
+  rotation 0 0 1 4.7
+  scale 15
+  name "rock_52"
+}
+Rock {
+  translation 207.8 -23.1 0
+  rotation 0 0 1 2.1
+  scale 13
+  name "rock_53"
+}
+Rock {
+  translation 660.4 -27.4 0
+  rotation 0 0 1 0.5
+  scale 28
+  name "rock_54"
+}
+Rock {
+  translation 173.8 -34.0 0
+  rotation 0 0 1 0.7
+  scale 24
+  name "rock_55"
+}
+Rock {
+  translation 2.7 -4.0 0
+  rotation 0 0 1 1.2
+  scale 19
+  name "rock_56"
+}
+Rock {
+  translation 593.8 -16.7 0
+  rotation 0 0 1 2.2
+  scale 28
+  name "rock_57"
+}
+Rock {
+  translation 231.5 16.6 0
+  rotation 0 0 1 5.1
+  scale 15
+  name "rock_58"
+}
+Rock {
+  translation 687.4 33.9 0
+  rotation 0 0 1 0.6
+  scale 16
+  name "rock_59"
+}
+Rock {
+  translation 787.8 10.0 0
+  rotation 0 0 1 1.2
+  scale 27
+  name "rock_60"
+}
+Rock {
+  translation 425.1 3.6 0
+  rotation 0 0 1 1.0
+  scale 28
+  name "rock_61"
+}
+Rock {
+  translation 647.6 32.7 0
+  rotation 0 0 1 0.5
+  scale 28
+  name "rock_62"
+}
+Rock {
+  translation 165.9 -15.4 0
+  rotation 0 0 1 3.1
+  scale 26
+  name "rock_63"
+}
+Rock {
+  translation 749.0 5.5 0
+  rotation 0 0 1 4.8
+  scale 22
+  name "rock_64"
+}
+Rock {
+  translation 288.6 -30.1 0
+  rotation 0 0 1 4.3
+  scale 26
+  name "rock_65"
+}
+Rock {
+  translation 688.7 16.0 0
+  rotation 0 0 1 4.0
+  scale 27
+  name "rock_66"
+}
+Rock {
+  translation 493.8 -33.6 0
+  rotation 0 0 1 2.0
+  scale 28
+  name "rock_67"
+}
+Rock {
+  translation 39.9 -5.4 0
+  rotation 0 0 1 2.0
+  scale 22
+  name "rock_68"
+}
+Rock {
+  translation 322.3 -20.0 0
+  rotation 0 0 1 0.4
+  scale 22
+  name "rock_69"
+}
+Rock {
+  translation 91.3 37.0 0
+  rotation 0 0 1 4.0
+  scale 16
+  name "rock_70"
+}
+Rock {
+  translation 836.0 6.0 0
+  rotation 0 0 1 3.7
+  scale 19
+  name "rock_71"
+}
+Rock {
+  translation 950.8 40.0 0
+  rotation 0 0 1 3.2
+  scale 17
+  name "rock_72"
+}
+Rock {
+  translation 40.2 20.5 0
+  rotation 0 0 1 2.9
+  scale 9
+  name "rock_73"
+}
+Rock {
+  translation 470.5 12.1 0
+  rotation 0 0 1 0.4
+  scale 17
+  name "rock_74"
+}
+Rock {
+  translation 916.1 -25.5 0
+  rotation 0 0 1 0.5
+  scale 10
+  name "rock_75"
+}
+Rock {
+  translation 585.3 10.8 0
+  rotation 0 0 1 3.9
+  scale 24
+  name "rock_76"
+}
+Rock {
+  translation 348.0 -13.3 0
+  rotation 0 0 1 2.4
+  scale 26
+  name "rock_77"
+}
+Rock {
+  translation 670.1 28.6 0
+  rotation 0 0 1 3.5
+  scale 9
+  name "rock_78"
+}
+Rock {
+  translation 329.8 15.5 0
+  rotation 0 0 1 2.8
+  scale 26
+  name "rock_79"
+}
+Rock {
+  translation 288.2 35.6 0
+  rotation 0 0 1 4.1
+  scale 18
+  name "rock_80"
+}
+Rock {
+  translation 813.6 4.0 0
+  rotation 0 0 1 3.8
+  scale 24
+  name "rock_81"
+}
+Rock {
+  translation 454.8 -14.8 0
+  rotation 0 0 1 0.9
+  scale 9
+  name "rock_82"
+}
+Rock {
+  translation 323.3 37.6 0
+  rotation 0 0 1 2.8
+  scale 18
+  name "rock_83"
+}
+Rock {
+  translation 404.2 1.2 0
+  rotation 0 0 1 6.2
+  scale 10
+  name "rock_84"
+}
+Rock {
+  translation 542.6 -6.9 0
+  rotation 0 0 1 3.2
+  scale 13
+  name "rock_85"
+}
+Rock {
+  translation 187.6 -11.1 0
+  rotation 0 0 1 0.2
+  scale 30
+  name "rock_86"
+}
+Rock {
+  translation 756.4 10.0 0
+  rotation 0 0 1 2.8
+  scale 22
+  name "rock_87"
+}
+Rock {
+  translation 760.0 -23.7 0
+  rotation 0 0 1 3.3
+  scale 27
+  name "rock_88"
+}
+Rock {
+  translation 549.2 34.2 0
+  rotation 0 0 1 1.0
+  scale 19
+  name "rock_89"
+}
+Rock {
+  translation 608.9 -20.9 0
+  rotation 0 0 1 5.8
+  scale 20
+  name "rock_90"
+}
+Rock {
+  translation 158.4 4.1 0
+  rotation 0 0 1 2.6
+  scale 18
+  name "rock_91"
+}
+Rock {
+  translation 992.3 33.0 0
+  rotation 0 0 1 4.3
+  scale 9
+  name "rock_92"
+}
+Rock {
+  translation 461.4 -30.6 0
+  rotation 0 0 1 5.0
+  scale 28
+  name "rock_93"
+}
+Rock {
+  translation 832.1 -0.1 0
+  rotation 0 0 1 2.1
+  scale 18
+  name "rock_94"
+}
+Rock {
+  translation 980.2 -20.5 0
+  rotation 0 0 1 0.6
+  scale 29
+  name "rock_95"
+}
+Rock {
+  translation 551.3 -9.3 0
+  rotation 0 0 1 2.4
+  scale 16
+  name "rock_96"
+}
+Rock {
+  translation 921.9 0.7 0
+  rotation 0 0 1 4.5
+  scale 29
+  name "rock_97"
+}
+Rock {
+  translation 276.2 23.2 0
+  rotation 0 0 1 6.1
+  scale 27
+  name "rock_98"
+}
+Rock {
+  translation 414.9 34.7 0
+  rotation 0 0 1 5.5
+  scale 18
+  name "rock_99"
+}
+Rock {
+  translation 507.7 25.6 0
+  rotation 0 0 1 0.5
+  scale 29
+  name "rock_100"
+}
+Rock {
+  translation 282.8 -16.1 0
+  rotation 0 0 1 0.9
+  scale 19
+  name "rock_101"
+}
+Rock {
+  translation 586.9 39.9 0
+  rotation 0 0 1 1.9
+  scale 28
+  name "rock_102"
+}
+Rock {
+  translation 489.6 -28.1 0
+  rotation 0 0 1 4.4
+  scale 20
+  name "rock_103"
+}
+Rock {
+  translation 538.6 -12.4 0
+  rotation 0 0 1 0.8
+  scale 30
+  name "rock_104"
+}
+Rock {
+  translation 551.9 3.5 0
+  rotation 0 0 1 5.9
+  scale 17
+  name "rock_105"
+}
+Rock {
+  translation 188.7 15.8 0
+  rotation 0 0 1 3.5
+  scale 28
+  name "rock_106"
+}
+Rock {
+  translation 571.8 -21.3 0
+  rotation 0 0 1 5.0
+  scale 12
+  name "rock_107"
+}
+Rock {
+  translation 775.5 -36.5 0
+  rotation 0 0 1 4.2
+  scale 29
+  name "rock_108"
+}
+Rock {
+  translation 744.7 16.4 0
+  rotation 0 0 1 5.7
+  scale 10
+  name "rock_109"
+}
+Rock {
+  translation 811.4 -9.1 0
+  rotation 0 0 1 4.1
+  scale 21
+  name "rock_110"
+}
+Rock {
+  translation 663.7 25.7 0
+  rotation 0 0 1 3.2
+  scale 8
+  name "rock_111"
+}
+Rock {
+  translation 37.0 0.2 0
+  rotation 0 0 1 2.3
+  scale 13
+  name "rock_112"
+}
+Rock {
+  translation 590.2 29.6 0
+  rotation 0 0 1 6.0
+  scale 18
+  name "rock_113"
+}
+Rock {
+  translation 874.2 -4.8 0
+  rotation 0 0 1 6.0
+  scale 23
+  name "rock_114"
+}
+Rock {
+  translation 722.4 -7.2 0
+  rotation 0 0 1 1.2
+  scale 12
+  name "rock_115"
+}
+Rock {
+  translation 654.8 -27.7 0
+  rotation 0 0 1 1.0
+  scale 17
+  name "rock_116"
+}
+Rock {
+  translation 469.5 37.5 0
+  rotation 0 0 1 5.3
+  scale 11
+  name "rock_117"
+}
+Rock {
+  translation 338.6 15.4 0
+  rotation 0 0 1 3.2
+  scale 25
+  name "rock_118"
+}
+Rock {
+  translation 649.8 28.1 0
+  rotation 0 0 1 5.2
+  scale 24
+  name "rock_119"
+}
+Rock {
+  translation 380.0 -14.7 0
+  rotation 0 0 1 0.2
+  scale 18
+  name "rock_120"
+}
+Rock {
+  translation 718.7 20.8 0
+  rotation 0 0 1 5.5
+  scale 27
+  name "rock_121"
+}
+Rock {
+  translation 872.4 -37.1 0
+  rotation 0 0 1 0.8
+  scale 20
+  name "rock_122"
+}
+Rock {
+  translation 920.9 39.8 0
+  rotation 0 0 1 1.0
+  scale 13
+  name "rock_123"
+}
+Rock {
+  translation 746.8 -5.3 0
+  rotation 0 0 1 5.2
+  scale 27
+  name "rock_124"
+}
+Rock {
+  translation 98.4 10.7 0
+  rotation 0 0 1 5.1
+  scale 13
+  name "rock_125"
+}
+Rock {
+  translation 694.0 32.3 0
+  rotation 0 0 1 4.5
+  scale 9
+  name "rock_126"
+}
+Rock {
+  translation 46.0 23.7 0
+  rotation 0 0 1 2.6
+  scale 29
+  name "rock_127"
+}
+Rock {
+  translation 293.4 -10.0 0
+  rotation 0 0 1 4.5
+  scale 22
+  name "rock_128"
+}
+Rock {
+  translation 145.6 2.5 0
+  rotation 0 0 1 3.8
+  scale 22
+  name "rock_129"
+}
+Rock {
+  translation 565.9 23.4 0
+  rotation 0 0 1 1.5
+  scale 15
+  name "rock_130"
+}
+Rock {
+  translation 240.8 33.0 0
+  rotation 0 0 1 1.9
+  scale 23
+  name "rock_131"
+}
+Rock {
+  translation 143.1 -3.1 0
+  rotation 0 0 1 5.7
+  scale 14
+  name "rock_132"
+}
+Rock {
+  translation 254.0 -19.6 0
+  rotation 0 0 1 2.3
+  scale 26
+  name "rock_133"
+}
+Rock {
+  translation 9.4 24.4 0
+  rotation 0 0 1 6.2
+  scale 22
+  name "rock_134"
+}
+Rock {
+  translation 901.2 14.2 0
+  rotation 0 0 1 4.8
+  scale 20
+  name "rock_135"
+}
+Rock {
+  translation 158.0 -4.7 0
+  rotation 0 0 1 3.2
+  scale 21
+  name "rock_136"
+}
+Rock {
+  translation 345.6 7.0 0
+  rotation 0 0 1 6.1
+  scale 14
+  name "rock_137"
+}
+Rock {
+  translation 638.9 -6.1 0
+  rotation 0 0 1 5.0
+  scale 12
+  name "rock_138"
+}
+Rock {
+  translation 250.1 27.6 0
+  rotation 0 0 1 5.5
+  scale 9
+  name "rock_139"
+}
+Rock {
+  translation 199.2 -9.2 0
+  rotation 0 0 1 4.0
+  scale 19
+  name "rock_140"
+}
+Rock {
+  translation 571.9 6.0 0
+  rotation 0 0 1 3.5
+  scale 11
+  name "rock_141"
+}
+Rock {
+  translation 977.9 12.7 0
+  rotation 0 0 1 4.5
+  scale 24
+  name "rock_142"
+}
+Rock {
+  translation 274.5 5.3 0
+  rotation 0 0 1 5.3
+  scale 17
+  name "rock_143"
+}
+Rock {
+  translation 49.0 8.5 0
+  rotation 0 0 1 0.5
+  scale 13
+  name "rock_144"
+}
+Rock {
+  translation 496.7 32.3 0
+  rotation 0 0 1 1.7
+  scale 24
+  name "rock_145"
+}
+Rock {
+  translation 286.2 23.9 0
+  rotation 0 0 1 0.9
+  scale 21
+  name "rock_146"
+}
+Rock {
+  translation 607.1 -11.8 0
+  rotation 0 0 1 0.6
+  scale 15
+  name "rock_147"
+}
+Rock {
+  translation 636.6 9.7 0
+  rotation 0 0 1 5.1
+  scale 19
+  name "rock_148"
+}
+Rock {
+  translation 677.8 17.7 0
+  rotation 0 0 1 5.8
+  scale 21
+  name "rock_149"
+}
+Rock {
+  translation 628.2 32.3 0
+  rotation 0 0 1 0.3
+  scale 24
+  name "rock_150"
+}

@@ -5,7 +5,6 @@ import { StatsPanel } from '@/components/StatsPanel';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { DetectionSimulator } from '@/components/DetectionSimulator';
 import { useAppStore } from '@/store/index';
-import { Info } from 'lucide-react';
 
 function App() {
   const theme = useAppStore((state) => state.theme);
@@ -16,16 +15,11 @@ function App() {
         {/* Header */}
         <header className="border-b border-border sticky top-0 z-40 bg-card/95 backdrop-blur">
           <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                <Info className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold">EUDIS</h1>
-                <p className="text-xs text-muted-foreground">
-                  System monitorowania dronów z wykorzystaniem sensorów audio
-                </p>
-              </div>
+            <div>
+              <h1 className="text-2xl font-bold">EUDIS</h1>
+              <p className="text-xs text-muted-foreground">
+                System monitorowania dronów z wykorzystaniem sensorów audio
+              </p>
             </div>
             <ThemeSwitcher />
           </div>

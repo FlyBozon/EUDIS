@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import * as L from 'leaflet';
 import { useAppStore } from '@/store/index';
-import { Search } from 'lucide-react';
 import './styles/map.css';
 
 export const MapComponent = () => {
@@ -12,6 +11,8 @@ export const MapComponent = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Array<{ name: string; lat: number; lon: number }>>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchAbortRef = useRef<AbortController | null>(null);
   
   const deploymentLines = useAppStore((state) => state.deploymentLines);
   const espNodes = useAppStore((state) => state.espNodes);
@@ -25,23 +26,51 @@ export const MapComponent = () => {
 
   // Funkcja do wyszukiwania lokalizacji
   const handleSearch = async (query: string) => {
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
+    }
     if (query.length < 2) {
       setSearchResults([]);
+      setShowSearchResults(false);
       return;
     }
 
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=pl&limit=5`
-      );
-      const data = await response.json();
-      setSearchResults(data);
-      setShowSearchResults(true);
-    } catch (error) {
-      console.error('Search failed:', error);
-      setSearchResults([]);
-    }
+    searchDebounceRef.current = setTimeout(async () => {
+      try {
+        // cancel previous request if any
+        if (searchAbortRef.current) {
+          searchAbortRef.current.abort();
+        }
+        const controller = new AbortController();
+        searchAbortRef.current = controller;
+
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=pl&limit=5`,
+          { signal: controller.signal }
+        );
+        const data = await response.json();
+        setSearchResults(data);
+        setShowSearchResults(true);
+      } catch (error) {
+        if ((error as any)?.name !== 'AbortError') {
+          console.error('Search failed:', error);
+          setSearchResults([]);
+        }
+      }
+    }, 500);
   };
+
+  // Cleanup pending debounce/requests on unmount
+  useEffect(() => {
+    return () => {
+      if (searchDebounceRef.current) {
+        clearTimeout(searchDebounceRef.current);
+      }
+      if (searchAbortRef.current) {
+        searchAbortRef.current.abort();
+      }
+    };
+  }, []);
 
   // Funkcja do zbliżenia do wybranej lokalizacji
   const handleLocationSelect = (lat: number, lon: number) => {
@@ -220,15 +249,15 @@ export const MapComponent = () => {
       {/* Search Bar - Top Left */}
       <div className="absolute top-4 left-4 z-40 w-72">
         <div className="relative">
-          <div className="flex items-center gap-2 bg-card border border-border rounded-lg shadow-lg px-3 py-2">
-            <Search className="w-4 h-4 text-muted-foreground" />
+          <div className="flex items-center bg-card border border-border rounded-lg shadow-lg px-3 py-2">
             <input
               type="text"
               placeholder="Szukaj lokalizacji..."
               value={searchQuery}
               onChange={(e) => {
-                setSearchQuery(e.target.value);
-                handleSearch(e.target.value);
+                const value = e.target.value;
+                setSearchQuery(value);
+                handleSearch(value);
               }}
               onFocus={() => searchResults.length > 0 && setShowSearchResults(true)}
               className="flex-1 bg-transparent outline-none text-sm placeholder:text-muted-foreground"
@@ -241,8 +270,9 @@ export const MapComponent = () => {
                   setShowSearchResults(false);
                 }}
                 className="text-muted-foreground hover:text-foreground"
+                aria-label="Wyczyść"
               >
-                ✕
+                ×
               </button>
             )}
           </div>
@@ -281,9 +311,8 @@ export const MapComponent = () => {
               setIsSelectingMode(true);
               setSelectionStep('start');
             }}
-            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-blue-700 transition-all font-semibold flex items-center gap-2 group"
+            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-blue-700 transition-all font-semibold"
           >
-            <span className="text-lg group-hover:scale-110 transition-transform">✈️</span>
             Zaplanuj trasę
           </button>
         </div>
@@ -294,7 +323,7 @@ export const MapComponent = () => {
         <div className="absolute top-4 right-4 z-40">
           <div className="bg-card border border-border rounded-lg shadow-lg p-4 w-72">
             {/* Header */}
-            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-base">Zaplanuj trasę</h3>
               <button
                 onClick={() => {
@@ -302,8 +331,9 @@ export const MapComponent = () => {
                   setSelectionStep(null);
                 }}
                 className="text-muted-foreground hover:text-foreground text-xl leading-none"
+                aria-label="Zamknij"
               >
-                ✕
+                ×
               </button>
             </div>
 
@@ -319,7 +349,7 @@ export const MapComponent = () => {
                       ? 'bg-green-500 text-white'
                       : 'bg-muted text-muted-foreground border border-border'
                   }`}>
-                    {missionStartPoint ? '✓' : '1'}
+                    {'1'}
                   </div>
                   {selectionStep === 'start' && <div className="w-0.5 h-12 bg-blue-400 mt-2" />}
                 </div>
@@ -327,7 +357,7 @@ export const MapComponent = () => {
                   <div className="font-medium text-sm">Punkt startowy</div>
                   {missionStartPoint ? (
                     <p className="text-xs text-green-600 dark:text-green-400">
-                      ✓ Wybrano: {missionStartPoint[0].toFixed(4)}°, {missionStartPoint[1].toFixed(4)}°
+                      Wybrano: {missionStartPoint[0].toFixed(4)}°, {missionStartPoint[1].toFixed(4)}°
                     </p>
                   ) : selectionStep === 'start' ? (
                     <p className="text-xs text-blue-600 dark:text-blue-400 animate-pulse">
@@ -351,14 +381,14 @@ export const MapComponent = () => {
                       ? 'bg-muted text-muted-foreground border border-border'
                       : 'bg-gray-300 text-gray-500'
                   }`}>
-                    {missionEndPoint ? '✓' : '2'}
+                    {'2'}
                   </div>
                 </div>
                 <div className="flex-1 pt-1">
                   <div className="font-medium text-sm">Punkt końcowy</div>
                   {missionEndPoint ? (
                     <p className="text-xs text-red-600 dark:text-red-400">
-                      ✓ Wybrano: {missionEndPoint[0].toFixed(4)}°, {missionEndPoint[1].toFixed(4)}°
+                      Wybrano: {missionEndPoint[0].toFixed(4)}°, {missionEndPoint[1].toFixed(4)}°
                     </p>
                   ) : selectionStep === 'end' ? (
                     <p className="text-xs text-blue-600 dark:text-blue-400 animate-pulse">
@@ -418,23 +448,22 @@ export const MapComponent = () => {
         <div className="absolute bottom-4 left-4 z-40">
           <div className="bg-card border border-border rounded-lg shadow-lg p-3 space-y-2 w-72">
             <div className="flex items-center justify-between">
-              <h4 className="font-semibold text-sm flex items-center gap-2">
-                <span className="text-lg">✈️</span> Zaplanowana trasa
-              </h4>
+              <h4 className="font-semibold text-sm">Zaplanowana trasa</h4>
               <button
                 onClick={() => {
                   setMissionStartPoint(null);
                   setMissionEndPoint(null);
                 }}
                 className="text-muted-foreground hover:text-foreground text-sm"
+                aria-label="Usuń trasę"
               >
-                ✕
+                ×
               </button>
             </div>
 
             {missionStartPoint && (
               <div className="flex items-center gap-2 text-xs">
-                <span className="text-lg">🟢</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block" aria-hidden />
                 <div>
                   <div className="font-medium">Start</div>
                   <div className="text-muted-foreground">
@@ -446,7 +475,7 @@ export const MapComponent = () => {
 
             {missionEndPoint && (
               <div className="flex items-center gap-2 text-xs">
-                <span className="text-lg">🔴</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block" aria-hidden />
                 <div>
                   <div className="font-medium">Koniec</div>
                   <div className="text-muted-foreground">

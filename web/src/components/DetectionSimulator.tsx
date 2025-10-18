@@ -18,7 +18,7 @@ export const DetectionSimulator = () => {
           id: `detection-${Date.now()}-${Math.random()}`,
           lineId: randomNode.id,
           timestamp: Date.now(),
-          intensity: Math.random() * 100,
+          intensity: 60 + Math.random() * 40,
           frequency: 20 + Math.random() * 80,
         };
 

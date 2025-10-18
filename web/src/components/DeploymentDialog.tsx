@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/dialog';
 import { useAppStore } from '@/store/index';
 import { DeploymentLine } from '@/types/index';
-import { Plane } from 'lucide-react';
 
 export const DeploymentDialog = () => {
   const [spacing, setSpacing] = useState<300 | 500 | 1000>(500);
@@ -106,32 +105,32 @@ export const DeploymentDialog = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button 
-          size="lg" 
-          className="gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold"
+        <Button
+          size="lg"
+          className={`gap-2 font-semibold w-full ${!missionStartPoint || !missionEndPoint ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white'}`}
+          disabled={!missionStartPoint || !missionEndPoint}
+          title={!missionStartPoint || !missionEndPoint ? 'Zaznacz trasę na mapie, aby włączyć tę akcję' : undefined}
         >
-          <Plane className="w-5 h-5" />
-          Wyślij drona
+          {missionStartPoint && missionEndPoint ? 'Wyślij drona' : 'Wybierz trasę na mapie'}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <span className="text-2xl">✈️</span> Konfiguruj wdrożenie
+          <DialogTitle className="text-xl">
+            Konfiguracja wdrożenia
           </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-5">
           {/* Checklist - Route Planning */}
           <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-3">
-            <h4 className="font-semibold text-sm text-blue-900 dark:text-blue-200 flex items-center gap-2">
-              <span>📍</span> Zaplanowana trasa
+            <h4 className="font-semibold text-sm text-blue-900 dark:text-blue-200">
+              Zaplanowana trasa
             </h4>
             
             <div className="space-y-2 ml-6 text-sm">
               <div className="flex items-center gap-2">
-                <span className={missionStartPoint ? '✅' : '⭕'}>
-                </span>
+                <span className="w-3 h-3 inline-block rounded-full" style={{ background: missionStartPoint ? '#16a34a' : '#cbd5e1' }} />
                 <span className="text-muted-foreground">Punkt startowy</span>
                 {missionStartPoint && (
                   <span className="text-green-600 dark:text-green-400 text-xs ml-auto">
@@ -141,8 +140,7 @@ export const DeploymentDialog = () => {
               </div>
               
               <div className="flex items-center gap-2">
-                <span className={missionEndPoint ? '✅' : '⭕'}>
-                </span>
+                <span className="w-3 h-3 inline-block rounded-full" style={{ background: missionEndPoint ? '#dc2626' : '#cbd5e1' }} />
                 <span className="text-muted-foreground">Punkt końcowy</span>
                 {missionEndPoint && (
                   <span className="text-red-600 dark:text-red-400 text-xs ml-auto">
@@ -154,7 +152,7 @@ export const DeploymentDialog = () => {
 
             {!missionStartPoint || !missionEndPoint ? (
               <p className="text-xs text-blue-700 dark:text-blue-300 ml-6">
-                💡 Zatwierdź trasę na mapie przed konfiguracją wdrożenia
+                Zatwierdź trasę na mapie przed konfiguracją wdrożenia
               </p>
             ) : (
               <div className="ml-6 pt-2 border-t border-blue-200 dark:border-blue-700">
@@ -172,7 +170,7 @@ export const DeploymentDialog = () => {
 
           {/* Spacing Configuration */}
           <div className="space-y-3">
-            <label className="text-sm font-semibold block">🎯 Rozstaw sensorów ESP</label>
+            <label className="text-sm font-semibold block">Rozstaw sensorów ESP</label>
             <div className="grid grid-cols-3 gap-2">
               {[
                 { value: 300, label: '300m', desc: 'Denser' },
@@ -194,17 +192,17 @@ export const DeploymentDialog = () => {
               ))}
             </div>
             <p className="text-xs text-muted-foreground">
-              {spacing === 300 && '🔍 Sensorów: ~20-30'}
-              {spacing === 500 && '📊 Sensorów: ~10-20'}
-              {spacing === 1000 && '📡 Sensorów: ~5-10'}
+              {spacing === 300 && 'Sensorów: ~20-30'}
+              {spacing === 500 && 'Sensorów: ~10-20'}
+              {spacing === 1000 && 'Sensorów: ~5-10'}
             </p>
           </div>
 
           {/* Cost and Weight Summary */}
           {missionStartPoint && missionEndPoint && (
             <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4 space-y-3">
-              <h4 className="font-semibold text-sm text-amber-900 dark:text-amber-200 flex items-center gap-2">
-                <span>💰</span> Szacunkowe koszty i waga
+              <h4 className="font-semibold text-sm text-amber-900 dark:text-amber-200">
+                Szacunkowe koszty i waga
               </h4>
               
               <div className="space-y-2 ml-6 text-sm">
@@ -222,14 +220,14 @@ export const DeploymentDialog = () => {
 
                 <div className="border-t border-amber-200 dark:border-amber-700 pt-2 mt-2">
                   <div className="flex items-center justify-between text-muted-foreground mb-2">
-                    <span>💵 Koszt całkowity (PLN):</span>
+                    <span>Koszt całkowity (PLN):</span>
                     <span className="font-bold text-amber-700 dark:text-amber-300">
                       {Math.round(costAndWeightData[spacing].costMin * distanceKm)} – {Math.round(costAndWeightData[spacing].costMax * distanceKm)}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between text-muted-foreground">
-                    <span>⚖️ Waga całkowita (kg):</span>
+                    <span>Waga całkowita (kg):</span>
                     <span className="font-bold text-amber-700 dark:text-amber-300">
                       {Math.round(costAndWeightData[spacing].weightMin * distanceKm * 10) / 10} – {Math.round(costAndWeightData[spacing].weightMax * distanceKm * 10) / 10}
                     </span>
@@ -245,8 +243,7 @@ export const DeploymentDialog = () => {
             className="w-full h-11 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold gap-2"
             disabled={!missionStartPoint || !missionEndPoint}
           >
-            <Plane className="w-5 h-5" />
-            {missionStartPoint && missionEndPoint ? 'Wdróż drona' : 'Wybierz trasę na mapie'}
+              {missionStartPoint && missionEndPoint ? 'Wdróż drona' : 'Wybierz trasę na mapie'}
           </Button>
 
           {/* Info */}
