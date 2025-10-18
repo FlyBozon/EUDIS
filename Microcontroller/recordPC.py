@@ -9,7 +9,7 @@ SAMPLE_WIDTH = 2  # 16-bit = 2 bytes
 RECORD_SECONDS = 10
 GAIN = 20.0
 
-ser = serial.Serial('COM7', 921600, timeout=1)
+ser = serial.Serial('/dev/ttyACM0', 921600, timeout=1)
 
 wav_file = wave.open('recording.wav', 'wb')
 wav_file.setnchannels(CHANNELS)

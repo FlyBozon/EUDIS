@@ -6,26 +6,38 @@
 
 #ifdef USE_TFLITE
 #include <tflm_esp32.h>
-// Różne dystrybucje biblioteki mają różne nazwy nagłówków
-#if __has_include(<EloquentTinyML.h>)
-    #include <EloquentTinyML.h>
-    #if __has_include("eloquent_tinyml/tf.h")
-        #include "eloquent_tinyml/tf.h"
-        #define HAS_ELOQUENT_TINYML 1
-    #else
-        #define HAS_ELOQUENT_TINYML 0
-    #endif
-#elif __has_include(<eloquent_tinyml.h>)
-    #include <eloquent_tinyml.h>
-    #if __has_include("eloquent_tinyml/tf.h")
-        #include "eloquent_tinyml/tf.h"
-        #define HAS_ELOQUENT_TINYML 1
-    #else
-        #define HAS_ELOQUENT_TINYML 0
-    #endif
+#include <esp_heap_caps.h>
+
+// Opcja A: natywna integracja z TFLite Micro (bez edycji biblioteki)
+#ifdef USE_NATIVE_TFLM
+    #include <tensorflow/lite/schema/schema_generated.h>
+    #include <tensorflow/lite/version.h>
+    #include <tensorflow/lite/micro/micro_interpreter.h>
+    #include <tensorflow/lite/micro/micro_mutable_op_resolver.h>
+    #include <tensorflow/lite/micro/micro_error_reporter.h>
 #else
-    #warning "EloquentTinyML not found, TFLite integration will be disabled"
-    #define HAS_ELOQUENT_TINYML 0
+    // Opcja B: EloquentTinyML (fallback)
+    // Różne dystrybucje biblioteki mają różne nazwy nagłówków
+    #if __has_include(<EloquentTinyML.h>)
+        #include <EloquentTinyML.h>
+        #if __has_include("eloquent_tinyml/tf.h")
+            #include "eloquent_tinyml/tf.h"
+            #define HAS_ELOQUENT_TINYML 1
+        #else
+            #define HAS_ELOQUENT_TINYML 0
+        #endif
+    #elif __has_include(<eloquent_tinyml.h>)
+        #include <eloquent_tinyml.h>
+        #if __has_include("eloquent_tinyml/tf.h")
+            #include "eloquent_tinyml/tf.h"
+            #define HAS_ELOQUENT_TINYML 1
+        #else
+            #define HAS_ELOQUENT_TINYML 0
+        #endif
+    #else
+        #warning "EloquentTinyML not found, TFLite integration will be disabled"
+        #define HAS_ELOQUENT_TINYML 0
+    #endif
 #endif
 #endif
 
@@ -71,7 +83,19 @@ public:
         }
         Serial.println("[DRONE] Generator spektrogramu zainicjalizowany");
         
-    #if defined(USE_TFLITE) && HAS_ELOQUENT_TINYML
+    #if defined(USE_TFLITE) && defined(USE_NATIVE_TFLM)
+        if (model_data != nullptr) {
+            Serial.println("[DRONE] Inicjalizuję TensorFlow Lite Micro (native)...");
+            tflm_enabled = tflm_native_begin(model_data);
+            if (tflm_enabled) {
+                Serial.println("[DRONE] ✓ TFLite gotowe (native)");
+            } else {
+                Serial.println("[DRONE] ⚠ Nie udało się zainicjalizować TFLite (native). Fallback do heurystyki");
+            }
+        } else {
+            Serial.println("[DRONE] Brak danych modelu TFLite → używam heurystyki");
+        }
+    #elif defined(USE_TFLITE) && HAS_ELOQUENT_TINYML
         // Spróbuj zainicjalizować TFLite (EloquentTinyML)
         if (model_data != nullptr) {
             Serial.println("[DRONE] Inicjalizuję TensorFlow Lite Micro...");
@@ -125,7 +149,13 @@ public:
             return 0.0f;
         }
         
-        #if defined(USE_TFLITE) && HAS_ELOQUENT_TINYML
+        #if defined(USE_TFLITE) && defined(USE_NATIVE_TFLM)
+        if (tflm_enabled) {
+            drone_confidence = tflm_native_infer(spectrogram);
+        } else {
+            drone_confidence = analyzeSpectrogram(spectrogram);
+        }
+        #elif defined(USE_TFLITE) && HAS_ELOQUENT_TINYML
         if (tflm_enabled) {
             // Uwaga: nasz docelowy model oczekuje 96x96x1 wejścia INT8 (0..1 skalowane do kwantyzacji).
             // W prostym wariancie spłaszczamy do wektora i przekazujemy do modelu jako float (predictInt8 zrobi kwantyzację).
@@ -156,9 +186,96 @@ public:
     }
     
 private:
-    #if defined(USE_TFLITE) && HAS_ELOQUENT_TINYML
+    #if defined(USE_TFLITE) && defined(USE_NATIVE_TFLM)
+    // Natywny TFLM: własny resolver i arena w PSRAM
+    static constexpr size_t TENSOR_ARENA_SIZE = 200 * 1024;
+    uint8_t* tensor_arena = nullptr;
+    tflite::ErrorReporter* error_reporter = nullptr;
+    tflite::MicroErrorReporter micro_error_reporter;
+    const tflite::Model* model_ref = nullptr;
+    tflite::MicroMutableOpResolver<24> resolver; // pojemność na operatory
+    tflite::MicroInterpreter* interpreter = nullptr;
+    TfLiteTensor* in = nullptr;
+    TfLiteTensor* out = nullptr;
+    bool tflm_enabled = false;
+
+    bool tflm_native_begin(const unsigned char* model_data) {
+        error_reporter = &micro_error_reporter;
+        model_ref = tflite::GetModel(model_data);
+        if (model_ref->version() != TFLITE_SCHEMA_VERSION) {
+            Serial.println("[TFLM] Model version mismatch");
+            return false;
+        }
+
+        // Rejestracja operatorów wymaganych przez model
+        resolver.AddAdd();
+        resolver.AddAveragePool2D();
+        resolver.AddConv2D();
+        resolver.AddDepthwiseConv2D();
+        resolver.AddFullyConnected();
+        resolver.AddRelu();
+        resolver.AddReshape();
+        resolver.AddSoftmax();
+        resolver.AddShape();
+        resolver.AddMul();
+        resolver.AddStridedSlice();
+        resolver.AddPack();
+
+        // Arena w PSRAM (preferowane) z zapasem, fallback do DRAM
+        tensor_arena = (uint8_t*) heap_caps_malloc(TENSOR_ARENA_SIZE, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+        if (!tensor_arena) tensor_arena = (uint8_t*) heap_caps_malloc(TENSOR_ARENA_SIZE, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+        if (!tensor_arena) {
+            Serial.println("[TFLM] Brak pamięci na arenę");
+            return false;
+        }
+
+        interpreter = new tflite::MicroInterpreter(model_ref, resolver, tensor_arena, TENSOR_ARENA_SIZE, error_reporter);
+        if (interpreter->AllocateTensors() != kTfLiteOk) {
+            Serial.println("[TFLM] AllocateTensors() failed");
+            return false;
+        }
+        in = interpreter->input(0);
+        out = interpreter->output(0);
+        return true;
+    }
+
+    float tflm_native_infer(const float* spectrogram) {
+        const int input_len = MelSpectrogramGenerator::MEL_SPEC_WIDTH * MelSpectrogramGenerator::MEL_SPEC_HEIGHT;
+        // Kwantyzacja do INT8: q = real/scale + zero_point (z zaokrągleniem i klamrowaniem)
+        const float scale = in->params.scale;
+        const int zp = in->params.zero_point;
+        for (int i = 0; i < input_len; i++) {
+            int32_t q = (int32_t) lroundf((spectrogram[i] / scale) + zp);
+            if (q < -128) q = -128; else if (q > 127) q = 127;
+            in->data.int8[i] = (int8_t) q;
+        }
+
+        if (interpreter->Invoke() != kTfLiteOk) {
+            Serial.println("[TFLM] Invoke() failed");
+            return analyzeSpectrogram(spectrogram);
+        }
+
+        // De-kwantyzacja wyjść do float
+        float p0, p1;
+        if (out->type == kTfLiteInt8) {
+            float os = out->params.scale; int ozp = out->params.zero_point;
+            p0 = (out->data.int8[0] - ozp) * os;
+            p1 = (out->data.int8[1] - ozp) * os;
+        } else if (out->type == kTfLiteFloat32) {
+            p0 = out->data.f[0];
+            p1 = out->data.f[1];
+        } else {
+            return analyzeSpectrogram(spectrogram);
+        }
+
+        float conf = p0; // przyjmijmy indeks 0 = dron
+        if (isnan(conf) || conf < 0.0f || conf > 1.0f) conf = 0.0f;
+        return conf;
+    }
+
+    #elif defined(USE_TFLITE) && HAS_ELOQUENT_TINYML
     // Minimalna implementacja integracji z EloquentTinyML
-    static constexpr uint8_t TF_NUM_OPS = 10; // dostosuj wg potrzeby (Conv, DepthwiseConv, Add, Relu, MaxPool, FC, Softmax)
+    static constexpr uint8_t TF_NUM_OPS = 16; // zwiększono, aby pomieścić wszystkie rejestrowane operatory
     static constexpr size_t TF_TENSOR_ARENA = 200 * 1024; // ~200KB arena: bezpieczniejsze dla DRAM
     Eloquent::TF::Sequential<TF_NUM_OPS, TF_TENSOR_ARENA> tf;
     bool tflm_enabled = false;
@@ -166,6 +283,20 @@ private:
     bool tf_begin(const unsigned char* model_data) {
         tf.setNumInputs(MelSpectrogramGenerator::MEL_SPEC_WIDTH * MelSpectrogramGenerator::MEL_SPEC_HEIGHT); // spłaszczone 2D → 1D
         tf.setNumOutputs(2);
+
+        // Zarejestruj brakujące operatory bez modyfikacji biblioteki
+        #ifdef TF_OP_SHAPE
+        tf.resolver.AddShape();
+        #endif
+        #ifdef TF_OP_MUL
+        tf.resolver.AddMul();
+        #endif
+        #ifdef TF_OP_STRIDEDSLICE
+        tf.resolver.AddStridedSlice();
+        #endif
+        #ifdef TF_OP_PACK
+        tf.resolver.AddPack();
+        #endif
 
         auto &err = tf.begin(model_data);
         if (err) {
