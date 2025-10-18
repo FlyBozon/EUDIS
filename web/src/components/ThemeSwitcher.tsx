@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Moon, Sun } from 'lucide-react';
 import { useAppStore } from '@/store/index';
 import { Button } from '@/components/ui/button';
 
@@ -42,31 +41,37 @@ export const ThemeSwitcher = () => {
   if (!mounted) return null;
 
   return (
-    <div className="flex items-center gap-2">
-      <Button
-        variant={theme === 'light' ? 'default' : 'outline'}
-        size="icon"
-        onClick={() => setTheme('light')}
-        title="Light theme"
-      >
-        <Sun className="w-4 h-4" />
-      </Button>
-      <Button
-        variant={theme === 'dark' ? 'default' : 'outline'}
-        size="icon"
-        onClick={() => setTheme('dark')}
-        title="Dark theme"
-      >
-        <Moon className="w-4 h-4" />
-      </Button>
-      <Button
-        variant={theme === 'auto' ? 'default' : 'outline'}
-        size="icon"
-        onClick={() => setTheme('auto')}
-        title="Auto theme"
-      >
-        <div className="w-4 h-4 text-xs flex items-center justify-center">A</div>
-      </Button>
+    <div className="flex items-center gap-2" aria-label="Wybór motywu">
+      <span className="text-sm text-muted-foreground">Motyw:</span>
+      <div role="group" aria-label="Motyw" className="inline-flex rounded-md border border-border overflow-hidden">
+        <Button
+          variant={theme === 'light' ? 'default' : 'ghost'}
+          onClick={() => setTheme('light')}
+          aria-pressed={theme === 'light'}
+          className={`px-3 py-1.5 rounded-none ${theme === 'light' ? '' : 'hover:bg-accent'}`}
+          title="Motyw jasny"
+        >
+          Jasny
+        </Button>
+        <Button
+          variant={theme === 'dark' ? 'default' : 'ghost'}
+          onClick={() => setTheme('dark')}
+          aria-pressed={theme === 'dark'}
+          className={`px-3 py-1.5 rounded-none border-l border-border ${theme === 'dark' ? '' : 'hover:bg-accent'}`}
+          title="Motyw ciemny"
+        >
+          Ciemny
+        </Button>
+        <Button
+          variant={theme === 'auto' ? 'default' : 'ghost'}
+          onClick={() => setTheme('auto')}
+          aria-pressed={theme === 'auto'}
+          className={`px-3 py-1.5 rounded-none border-l border-border ${theme === 'auto' ? '' : 'hover:bg-accent'}`}
+          title="Motyw systemowy"
+        >
+          Systemowy
+        </Button>
+      </div>
     </div>
   );
 };

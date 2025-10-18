@@ -1,5 +1,4 @@
 import { useAppStore } from '@/store/index';
-import { Activity, AlertCircle } from 'lucide-react';
 
 export const DetectionPanel = () => {
   const detections = useAppStore((state) => state.detections);
@@ -10,17 +9,13 @@ export const DetectionPanel = () => {
   return (
     <div className="bg-card border border-border rounded-lg p-4 h-full flex flex-col">
       <div className="flex items-center gap-2 mb-4">
-        <AlertCircle className="w-5 h-5 text-accent" />
         <h2 className="font-semibold">Wykrycia</h2>
-        <span className="ml-auto text-sm text-muted-foreground">
-          {detections.length}
-        </span>
+        <span className="ml-auto text-sm text-muted-foreground">{detections.length}</span>
       </div>
 
       <div className="flex-1 overflow-y-auto space-y-2">
         {recentDetections.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-            <Activity className="w-8 h-8 mb-2 opacity-50" />
+          <div className="flex items-center justify-center h-full text-muted-foreground">
             <p className="text-sm">Brak wykryć</p>
           </div>
         ) : (
@@ -40,8 +35,7 @@ export const DetectionPanel = () => {
                   </span>
                 </div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  Intensywność: {Math.round(detection.intensity)}% | Częstotliwość:{' '}
-                  {Math.round(detection.frequency)} dB
+                  Pewność: {Math.round(detection.intensity)}% | Poziom sygnału: {Math.round(detection.frequency)} dB
                 </div>
               </div>
             );
