@@ -1,0 +1,3 @@
+[submodule "Microcontroller/lib/EloquentTinyML"]
+	path = Microcontroller/lib/EloquentTinyML
+	url = https://github.com/eloquentarduino/EloquentTinyML.git

@@ -8,6 +8,7 @@ detections/
 urban-sound-8k
 *.zip
 *.pkl
+<<<<<<< HEAD
 template_visualization/
 *.png
 *.jpg
@@ -15,6 +16,10 @@ template_visualization/
 *.save
 remove_from_view/
 template/
+=======
+__pycache__/**
+
+>>>>>>> 024659f6f09f382e209c72029617bf6fd720734f
 
 # Microcontroller
 Microcontroller/.pio
