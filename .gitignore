@@ -8,6 +8,7 @@ detections/
 urban-sound-8k
 *.zip
 *.pkl
+__pycache__/**
 
 
 # Microcontroller

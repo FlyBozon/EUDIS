@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <I2S.h>
 #include <Adafruit_NeoPixel.h>
+#include "drone_inference.h"
 
 // I2S Pin Configuration for XIAO RP2040
 // WS (LRCLK) MUST be SCK + 1
@@ -17,9 +18,17 @@
 #define NEOPIXEL_PIN 12
 #define NUM_PIXELS 1
 
+// Drone detection configuration (from drone_inference.h)
+// #define DRONE_MODEL_INPUT_SIZE already defined in drone_inference.h
+// #define DRONE_TENSOR_ARENA_SIZE 8*1024
+
 I2S i2s(INPUT);
 int16_t audioBuffer[BUFFER_SIZE];
 Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+
+// Drone detection
+DroneDetector droneDetector;
+int16_t droneBuffer[DRONE_MODEL_INPUT_SIZE];
 
 // Heartbeat variables
 unsigned long lastPingTime = 0;
@@ -30,6 +39,9 @@ const unsigned long PING_INTERVAL_MS = 250;
 unsigned long lastMaxReset = 0;
 float maxVolume = 0;
 unsigned long lastLoudTime = 0;
+
+// Drone detection variables
+unsigned long lastDroneTime = 0;
 
 void setup() {
   Serial.begin(921600);
@@ -88,6 +100,14 @@ void setup() {
     digitalWrite(LED_BUILTIN, LOW);
     delay(100);
   }
+
+  // Initialize drone detector
+  if (droneDetector.initialize()) {
+    Serial.println("Drone detector initialized successfully");
+    droneDetector.setThreshold(0.6f);  // 60% confidence threshold
+  } else {
+    Serial.println("WARNING: Failed to initialize drone detector");
+  }
 }
 
 bool recording = false;
@@ -136,6 +156,36 @@ void loop() {
       Serial.write((uint8_t)((samplesToRead >> 8) & 0xFF)); // Sample count high byte
       Serial.write((uint8_t*)audioBuffer, bytesRead);       // Raw audio data
 
+      // Drone detection inference
+      static int droneBufferIdx = 0;
+      static unsigned long lastDroneCheck = 0;
+      
+      for (int i = 0; i < samplesToRead; i++) {
+        if (droneBufferIdx < DRONE_MODEL_INPUT_SIZE) {
+          droneBuffer[droneBufferIdx++] = audioBuffer[i];
+        }
+        
+        if (droneBufferIdx >= DRONE_MODEL_INPUT_SIZE) {
+          // Run inference when buffer is full
+          float confidence = droneDetector.detectDrone(droneBuffer, DRONE_MODEL_INPUT_SIZE);
+          
+          if (droneDetector.isDrone(confidence)) {
+            Serial1.println("drone");
+            lastDroneTime = currentTime;
+          }
+          
+          // Optional: Send confidence level to serial for debugging
+          if (millis() - lastDroneCheck > 2000) {
+            Serial.print("Drone confidence: ");
+            Serial.print(confidence, 3);
+            Serial.println("");
+            lastDroneCheck = millis();
+          }
+          
+          droneBufferIdx = 0;
+        }
+      }
+
       if (millis() - lastStatusUpdate > 1000) {
         digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
         lastStatusUpdate = millis();
@@ -181,11 +231,15 @@ void loop() {
       lastPongTime = currentTime;
     } else if (msg == "loud") {
       lastLoudTime = currentTime;
+    } else if (msg == "drone") {
+      lastDroneTime = currentTime;
     }
   }
 
-  // Update NeoPixel color based on heartbeat and loud sound
-  if (currentTime - lastLoudTime < 5000) { // If loud signal received within last 5 seconds
+  // Update NeoPixel color based on detections
+  if (currentTime - lastDroneTime < 5000) { // If drone signal received within last 5 seconds
+    pixels.setPixelColor(0, pixels.Color(255, 255, 0)); // Yellow
+  } else if (currentTime - lastLoudTime < 5000) { // If loud signal received within last 5 seconds
     pixels.setPixelColor(0, pixels.Color(0, 0, 255)); // Blue
   } else if (currentTime - lastPongTime < 2000) { // If pong received within last 2 seconds
     pixels.setPixelColor(0, pixels.Color(0, 255, 0)); // Green
