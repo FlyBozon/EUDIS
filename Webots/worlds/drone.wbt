@@ -1961,3 +1961,11 @@ Mavic2Pro {
   supervisor TRUE
   cameraSlot []
 }
+DEF DRONE2 Mavic2Pro {
+  translation 500 -1000 7.5
+  rotation 0 0 1 1.5708
+  name "drone2"
+  controller "<none>"
+  supervisor TRUE
+  cameraSlot []
+}
