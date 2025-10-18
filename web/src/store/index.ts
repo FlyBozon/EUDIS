@@ -22,6 +22,10 @@ interface AppStore {
   addDetection: (detection: Detection) => void;
   clearDetections: () => void;
 
+  // Drone simulation
+  dronePositions: Array<[number, number]>;
+  setDronePositions: (positions: Array<[number, number]>) => void;
+
   // UI states
   selectedLineId: string | null;
   setSelectedLineId: (id: string | null) => void;
@@ -66,6 +70,10 @@ export const useAppStore = create<AppStore>((set) => ({
       detections: [...state.detections, detection],
     })),
   clearDetections: () => set({ detections: [] }),
+
+  // Drone simulation
+  dronePositions: [],
+  setDronePositions: (positions) => set({ dronePositions: positions }),
 
   // UI
   selectedLineId: null,
