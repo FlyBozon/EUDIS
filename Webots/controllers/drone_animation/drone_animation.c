@@ -7,9 +7,11 @@
 #include <webots/keyboard.h>
 
 #define START_X -5.0
-#define END_X 150.0
+#define END_X 1000.0
 #define BASE_ALTITUDE 7.5
 #define DRONE_SPEED 6.25
+#define BALL_DROP_INTERVAL 100.0
+#define MAX_BALLS 15
 
 double multiOctaveNoise(double x, double base_freq, double base_amp, int octaves) {
     double total = 0.0;
@@ -46,10 +48,31 @@ int main(int argc, char **argv) {
 
     WbFieldRef trans_field = wb_supervisor_node_get_field(drone_node, "translation");
     WbFieldRef rotation_field = wb_supervisor_node_get_field(drone_node, "rotation");
+    
+    WbDeviceTag front_left_motor = wb_robot_get_device("front left propeller");
+    WbDeviceTag front_right_motor = wb_robot_get_device("front right propeller");
+    WbDeviceTag rear_left_motor = wb_robot_get_device("rear left propeller");
+    WbDeviceTag rear_right_motor = wb_robot_get_device("rear right propeller");
+
+    if (front_left_motor) {
+        wb_motor_set_position(front_left_motor, INFINITY);
+        wb_motor_set_velocity(front_left_motor, 150.0);
+    }
+    if (front_right_motor) {
+        wb_motor_set_position(front_right_motor, INFINITY);
+        wb_motor_set_velocity(front_right_motor, -150.0);
+    }
+    if (rear_left_motor) {
+        wb_motor_set_position(rear_left_motor, INFINITY);
+        wb_motor_set_velocity(rear_left_motor, 150.0);
+    }
+    if (rear_right_motor) {
+        wb_motor_set_position(rear_right_motor, INFINITY);
+        wb_motor_set_velocity(rear_right_motor, -150.0);
+    }
 
     const double initial_pos[3] = {START_X, 0.0, BASE_ALTITUDE};
     wb_supervisor_field_set_sf_vec3f(trans_field, initial_pos);
-
     for (int i = 0; i < 10; i++) {
         wb_robot_step(timestep);
     }
@@ -59,8 +82,13 @@ int main(int argc, char **argv) {
 
     int current_view = 0;
 
+    // Ball spawning variables
+    int ball_count = 0;
+    double next_drop_distance = BALL_DROP_INTERVAL;
+    WbNodeRef last_ball = NULL;
+
     printf("Camera Controls:\n");
-    printf("  1 - Free camera\n  2 - Drone FPV\n  3 - Follow\n  4 - Front\n\n");
+    printf("  1 - Free camera\n  2 - Drone FPV\n  3 - Follow\n  4 - Front\n  5 - Ball Follow\n\n");
     printf("Starting flight...\n");
 
     double start_time = wb_robot_get_time();
@@ -109,6 +137,9 @@ int main(int argc, char **argv) {
         } else if (key == '4' && current_view != 3) {
             current_view = 3;
             printf("Switched to: Front camera\n");
+        } else if (key == '5' && current_view != 4) {
+            current_view = 4;
+            printf("Switched to: Ball Follow camera\n");
         }
 
         double altitude_wave = 0.6 * sin(progress * M_PI * 2.0);
@@ -131,6 +162,48 @@ int main(int argc, char **argv) {
             pitch + roll * 0.5 + yaw * 0.3
         };
         wb_supervisor_field_set_sf_rotation(rotation_field, new_rotation);
+
+        // Ball spawning logic - drop a ball every 100m
+        if (distance_traveled >= next_drop_distance && ball_count < MAX_BALLS) {
+            char ball_def[64];
+            snprintf(ball_def, sizeof(ball_def), "BALL_%d", ball_count + 1);
+
+            char ball_string[512];
+            snprintf(ball_string, sizeof(ball_string),
+                "DEF %s Solid {\n"
+                "  translation %.2f %.2f %.2f\n"
+                "  children [\n"
+                "    Shape {\n"
+                "      appearance PBRAppearance {\n"
+                "        baseColor 1 0 0\n"
+                "        metalness 0\n"
+                "        roughness 0.5\n"
+                "      }\n"
+                "      geometry Sphere {\n"
+                "        radius 0.3\n"
+                "      }\n"
+                "    }\n"
+                "  ]\n"
+                "  boundingObject Sphere {\n"
+                "    radius 0.3\n"
+                "  }\n"
+                "  physics Physics {\n"
+                "    density 500\n"
+                "    bounce 0.5\n"
+                "  }\n"
+                "}\n",
+                ball_def, x, y, z);
+
+            WbNodeRef root = wb_supervisor_node_get_root();
+            WbFieldRef children = wb_supervisor_node_get_field(root, "children");
+            wb_supervisor_field_import_mf_node_from_string(children, -1, ball_string);
+
+            last_ball = wb_supervisor_node_get_from_def(ball_def);
+            ball_count++;
+
+            printf("Ball dropped at X=%.1f! (Ball %d/%d)\n", x, ball_count, MAX_BALLS);
+            next_drop_distance += BALL_DROP_INTERVAL;
+        }
 
         if (current_view == 0) {
 
@@ -207,10 +280,45 @@ int main(int argc, char **argv) {
                 0.0, 0.0, 1.0, M_PI - (pitch_angle + 0.4 + pitch_shake) + M_PI/6.0
             };
             wb_supervisor_field_set_sf_rotation(main_rot, front_orient);
+
+        } else if (current_view == 4 && vp_main && last_ball) {
+            // Ball follow camera - follows the last dropped ball
+            WbFieldRef ball_trans_field = wb_supervisor_node_get_field(last_ball, "translation");
+            const double *ball_pos = wb_supervisor_field_get_sf_vec3f(ball_trans_field);
+
+            WbFieldRef main_trans = wb_supervisor_node_get_field(vp_main, "position");
+            WbFieldRef main_rot = wb_supervisor_node_get_field(vp_main, "orientation");
+
+            double cam_shake_x = multiOctaveNoise(elapsed + 900.0, 2.4, 0.03, 2);
+            double cam_shake_y = multiOctaveNoise(elapsed + 1000.0, 2.7, 0.03, 2);
+            double cam_shake_z = multiOctaveNoise(elapsed + 1100.0, 2.9, 0.02, 2);
+
+            const double ball_cam_pos[3] = {
+                ball_pos[0] - 3.0 + cam_shake_x,
+                ball_pos[1] - 2.5 + cam_shake_y,
+                ball_pos[2] + 1.5 + cam_shake_z
+            };
+            wb_supervisor_field_set_sf_vec3f(main_trans, ball_cam_pos);
+
+            double dx_ball = ball_pos[0] - ball_cam_pos[0];
+            double dy_ball = ball_pos[1] - ball_cam_pos[1];
+            double dz_ball = ball_pos[2] - ball_cam_pos[2];
+            double dist_ball = sqrt(dx_ball*dx_ball + dy_ball*dy_ball + dz_ball*dz_ball);
+
+            dx_ball /= dist_ball;
+            dy_ball /= dist_ball;
+            dz_ball /= dist_ball;
+
+            double yaw_angle = atan2(dy_ball, dx_ball);
+
+            const double ball_orient[4] = {
+                0.0, 0.0, 1.0, yaw_angle
+            };
+            wb_supervisor_field_set_sf_rotation(main_rot, ball_orient);
         }
 
         if (elapsed - last_print >= 2.0) {
-            const char* cam_names[] = {"Free", "Drone FPV", "Follow", "Front"};
+            const char* cam_names[] = {"Free", "Drone FPV", "Follow", "Front", "Ball Follow"};
             printf("Time: %.1fs | Pos: (%.2f, %.2f, %.2f) | Progress: %.1f%% | View: %s\n",
                    elapsed, x, y, z, progress * 100.0, cam_names[current_view]);
             last_print = elapsed;
