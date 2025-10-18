@@ -1,0 +1,16 @@
+target_frequency=1156.5
+frequency_tolerance=20.0
+num_harmonics=2
+harmonic_tolerance=30
+min_harmonics_detected=1
+peak_threshold_multiplier=2.0
+min_peak_amplitude=100
+weight_fundamental=0.4
+weight_harmonics=0.4
+weight_amplitude=0.2
+detection_threshold=0.5
+stability_window=5
+stability_threshold=0.7000000000000001
+history_length=5
+require_fundamental=True
+detect_harmonics=True

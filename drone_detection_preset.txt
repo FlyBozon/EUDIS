@@ -1,0 +1,10 @@
+detection_threshold=0.76
+peak_threshold_multiplier=7.029999999999999
+harmonic_tolerance=22
+weight_harmonics=0.39370078740157477
+weight_bands=0.39370078740157477
+weight_stability=0.2125984251968504
+freq_low=200
+freq_high=1000
+fundamental_min=145
+fundamental_max=300

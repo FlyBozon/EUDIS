@@ -1,0 +1,377 @@
+[
+  {
+    "name": "Dron_1",
+    "target_frequency": 1143.0,
+    "frequency_tolerance": 20.0,
+    "harmonics": [
+      2275.0
+    ],
+    "harmonic_multiples": [
+      2
+    ],
+    "harmonic_tolerance": 30.0,
+    "metadata": {
+      "created_at": "2025-10-18T16:24:14.484351",
+      "confidence": 1.0,
+      "harmonic_multiples": [
+        2
+      ],
+      "all_peaks": [
+        [
+          1170.0,
+          179.84349259143647
+        ],
+        [
+          1143.0,
+          153.1002607867512
+        ],
+        [
+          1874.5,
+          129.0470673565324
+        ],
+        [
+          1162.5,
+          102.16738615850234
+        ],
+        [
+          1932.0,
+          99.90141231154026
+        ]
+      ]
+    },
+    "created_at": "2025-10-18T16:24:14.484351",
+    "confidence": 1.0
+  },
+  {
+    "name": "Dron_3",
+    "target_frequency": 886.5,
+    "frequency_tolerance": 20.0,
+    "harmonics": [
+      1750.0
+    ],
+    "harmonic_multiples": [
+      2
+    ],
+    "harmonic_tolerance": 30.0,
+    "metadata": {
+      "created_at": "2025-10-18T16:24:59.390065",
+      "confidence": 1.0,
+      "harmonic_multiples": [
+        2
+      ],
+      "all_peaks": [
+        [
+          2007.0,
+          424.32811473934265
+        ],
+        [
+          1146.5,
+          387.41436208078994
+        ],
+        [
+          886.5,
+          296.1359615352201
+        ],
+        [
+          1750.0,
+          278.58499505031665
+        ],
+        [
+          1775.0,
+          268.12869493994145
+        ]
+      ]
+    },
+    "created_at": "2025-10-18T16:24:59.390065",
+    "confidence": 1.0
+  },
+  {
+    "name": "Dron_4",
+    "target_frequency": 1028.0,
+    "frequency_tolerance": 20.0,
+    "harmonics": [
+      2046.0
+    ],
+    "harmonic_multiples": [
+      2
+    ],
+    "harmonic_tolerance": 30.0,
+    "metadata": {
+      "created_at": "2025-10-18T16:25:51.593324",
+      "confidence": 1.0,
+      "harmonic_multiples": [
+        2
+      ],
+      "all_peaks": [
+        [
+          1853.0,
+          158.8905412361173
+        ],
+        [
+          1028.0,
+          135.27126249515743
+        ],
+        [
+          1830.0,
+          128.5241399211165
+        ],
+        [
+          1040.0,
+          115.7074486348098
+        ],
+        [
+          1874.5,
+          113.464014700058
+        ]
+      ]
+    },
+    "created_at": "2025-10-18T16:25:51.593324",
+    "confidence": 1.0
+  },
+  {
+    "name": "Dron_2",
+    "target_frequency": 1759.5,
+    "frequency_tolerance": 30.0,
+    "harmonics": [],
+    "harmonic_multiples": [],
+    "harmonic_tolerance": 50.0,
+    "metadata": {
+      "created_at": "2025-10-18T16:25:58.519584",
+      "confidence": 0.0,
+      "harmonic_multiples": [],
+      "all_peaks": [
+        [
+          1759.5,
+          91.06541005305016
+        ],
+        [
+          1774.5,
+          84.79672878273084
+        ],
+        [
+          1898.0,
+          80.47391219588613
+        ],
+        [
+          1057.0,
+          77.49414856716575
+        ],
+        [
+          1909.5,
+          72.6626814465892
+        ]
+      ]
+    },
+    "created_at": "2025-10-18T16:25:58.519584",
+    "confidence": 0.0
+  },
+  {
+    "name": "Dron_5",
+    "target_frequency": 1145.5,
+    "frequency_tolerance": 20.0,
+    "harmonics": [
+      2326.5
+    ],
+    "harmonic_multiples": [
+      2
+    ],
+    "harmonic_tolerance": 30.0,
+    "metadata": {
+      "created_at": "2025-10-18T16:26:05.917659",
+      "confidence": 1.0,
+      "harmonic_multiples": [
+        2
+      ],
+      "all_peaks": [
+        [
+          1760.0,
+          68.11851215208617
+        ],
+        [
+          1773.5,
+          65.7931797895596
+        ],
+        [
+          1726.5,
+          56.37362124398183
+        ],
+        [
+          2326.5,
+          55.74013546785062
+        ],
+        [
+          1145.5,
+          54.60382119187405
+        ]
+      ]
+    },
+    "created_at": "2025-10-18T16:26:05.917659",
+    "confidence": 1.0
+  },
+  {
+    "name": "Dron_6",
+    "target_frequency": 1124.5,
+    "frequency_tolerance": 30.0,
+    "harmonics": [],
+    "harmonic_multiples": [],
+    "harmonic_tolerance": 50.0,
+    "metadata": {
+      "created_at": "2025-10-18T16:26:06.851038",
+      "confidence": 0.0,
+      "harmonic_multiples": [],
+      "all_peaks": [
+        [
+          1124.5,
+          58.46265327352277
+        ],
+        [
+          1744.5,
+          45.380647010825875
+        ],
+        [
+          1778.5,
+          44.37333930873963
+        ],
+        [
+          1806.0,
+          44.0933891099828
+        ],
+        [
+          1813.0,
+          43.85441263771005
+        ]
+      ]
+    },
+    "created_at": "2025-10-18T16:26:06.851038",
+    "confidence": 0.0
+  },
+  {
+    "name": "Dron_7",
+    "target_frequency": 84.5,
+    "frequency_tolerance": 20.0,
+    "harmonics": [
+      139.0,
+      223.5
+    ],
+    "harmonic_multiples": [
+      2,
+      3
+    ],
+    "harmonic_tolerance": 30.0,
+    "metadata": {
+      "created_at": "2025-10-18T16:27:24.250314",
+      "confidence": 1.0,
+      "harmonic_multiples": [
+        2,
+        3
+      ],
+      "all_peaks": [
+        [
+          139.0,
+          87.04536618308548
+        ],
+        [
+          145.0,
+          35.319390186674156
+        ],
+        [
+          100.0,
+          31.30029841209694
+        ],
+        [
+          133.5,
+          29.882883973631156
+        ],
+        [
+          84.5,
+          28.656957183819674
+        ]
+      ]
+    },
+    "created_at": "2025-10-18T16:27:24.250314",
+    "confidence": 1.0
+  },
+  {
+    "name": "Dron_8",
+    "target_frequency": 1801.0,
+    "frequency_tolerance": 30.0,
+    "harmonics": [],
+    "harmonic_multiples": [],
+    "harmonic_tolerance": 50.0,
+    "metadata": {
+      "created_at": "2025-10-18T16:27:29.226746",
+      "confidence": 0.0,
+      "harmonic_multiples": [],
+      "all_peaks": [
+        [
+          1801.0,
+          94.04313281927402
+        ],
+        [
+          1784.0,
+          79.4035547665066
+        ],
+        [
+          1874.5,
+          77.50860830543124
+        ],
+        [
+          1795.0,
+          71.74063573737553
+        ],
+        [
+          1927.0,
+          60.80677473168493
+        ]
+      ]
+    },
+    "created_at": "2025-10-18T16:27:29.226746",
+    "confidence": 0.0
+  },
+  {
+    "name": "Dron_9",
+    "target_frequency": 107.5,
+    "frequency_tolerance": 20.0,
+    "harmonics": [
+      250.5,
+      287.5
+    ],
+    "harmonic_multiples": [
+      2,
+      3
+    ],
+    "harmonic_tolerance": 30.0,
+    "metadata": {
+      "created_at": "2025-10-18T16:27:31.472175",
+      "confidence": 1.0,
+      "harmonic_multiples": [
+        2,
+        3
+      ],
+      "all_peaks": [
+        [
+          119.5,
+          54.2823069431865
+        ],
+        [
+          132.0,
+          45.88430925201777
+        ],
+        [
+          125.0,
+          40.802202854508735
+        ],
+        [
+          107.5,
+          38.73747685897279
+        ],
+        [
+          250.5,
+          31.566991362917932
+        ]
+      ]
+    },
+    "created_at": "2025-10-18T16:27:31.472175",
+    "confidence": 1.0
+  }
+]

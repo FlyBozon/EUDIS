@@ -7,9 +7,6 @@ import librosa
 from scipy.spatial.distance import cdist
 import time
 
-# ===============================
-# PARAMETRY
-# ===============================
 SR = 44100
 BLOCK = 1024
 WINDOW_SEC = 1.0
@@ -18,9 +15,6 @@ MARGIN = 0.1  # threshold margin dron vs tło
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# ===============================
-# TEMPLATE EXTRACTION
-# ===============================
 def extract_templates_from_folder(folder_path):
     templates = []
     for fname in os.listdir(folder_path):
@@ -41,17 +35,11 @@ def match_template(mfcc_window, templates):
         sims.append(1 - cdist(mfcc_window.flatten()[None,:], t.flatten()[None,:], metric='cosine')[0,0])
     return max(sims)
 
-# ===============================
-# LOAD TEMPLATES
-# ===============================
 print("Ładowanie template'ów dronów i tła...")
 drone_templates = extract_templates_from_folder("dataset/drones")
 background_templates = extract_templates_from_folder("dataset/not_drones")
 print(f"Ładowano {len(drone_templates)} template'ów dronów i {len(background_templates)} tła.")
 
-# ===============================
-# REAL-TIME DETEKTOR
-# ===============================
 def live_drone_detector():
     buffer = np.zeros(int(SR * 5))
     detections = []
@@ -121,7 +109,7 @@ def live_drone_detector():
         with open(txt_path,"w") as f:
             for t,s in detections:
                 f.write(f"{t}\t{s:.3f}\n")
-        print(f"✅ Zapisano listę wykryć: {txt_path}")
+        print(f"Zapisano listę wykryć: {txt_path}")
 
 if __name__ == "__main__":
     live_drone_detector()

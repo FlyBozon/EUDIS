@@ -30,12 +30,13 @@ def plot_fft(data, samplerate, filename, output_dir, max_freq=1000):
     print(f"Zapisano FFT: {fft_path}")
 
 
-def plot_spectrogram(data, samplerate, filename, output_dir):
+def plot_spectrogram(data, samplerate, filename, output_dir, max_freq=1000):
     plt.figure(figsize=(10, 5))
-    plt.specgram(data, Fs=samplerate, NFFT=1024, noverlap=512, cmap='magma')
+    plt.specgram(data, Fs=samplerate, NFFT=1024, noverlap=512, cmap='viridis')
     plt.title(f"Spektrogram — {filename}")
     plt.xlabel("Czas [s]")
     plt.ylabel("Częstotliwość [Hz]")
+    plt.ylim(0, max_freq)  # Ograniczenie do 1000 Hz
     plt.colorbar(label='Intensywność [dB]')
     plt.tight_layout()
     
@@ -67,9 +68,9 @@ def process_wav(filepath, output_dir):
         if len(data.shape) > 1:  # stereo -> mono
             data = data[:, 0]
         
-        # FFT i spektrogram z surowych danych
-        plot_fft(data, samplerate, filename, output_dir)
-        plot_spectrogram(data, samplerate, filename, output_dir)
+        # FFT i spektrogram z surowych danych (ograniczone do 1000 Hz)
+        plot_fft(data, samplerate, filename, output_dir, max_freq=1000)
+        plot_spectrogram(data, samplerate, filename, output_dir, max_freq=1000)
         
         # MFCC z librosa
         y, sr = librosa.load(filepath, sr=None, mono=True)

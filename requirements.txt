@@ -3,3 +3,4 @@ sounddevice
 matplotlib
 scipy
 librosa
+torch

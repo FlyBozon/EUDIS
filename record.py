@@ -3,7 +3,7 @@ from scipy.io.wavfile import write
 
 # === SETTINGS ===
 SAMPLE_RATE = 44100  # Sample rate in Hz
-DURATION = 360        # Duration to record in seconds
+DURATION = 10        # Duration to record in seconds
 OUTPUT_FILE = "recording.wav"
 
 print("🎤 Recording... Speak now!")
