@@ -11,9 +11,12 @@ import librosa.display
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 import pickle
+import json
+from datetime import datetime
 from tqdm import tqdm
 import cv2
 import warnings
+from sklearn.metrics import classification_report, confusion_matrix, precision_recall_fscore_support
 warnings.filterwarnings('ignore')
 
 # ======================== SPECTROGRAM GENERATION ========================
@@ -342,9 +345,9 @@ def load_spectrogram_dataset(data_dir, label_mapping, target_size=(224, 224),
 # ======================== TRAINING ========================
 
 def train_model(model, train_loader, val_loader, criterion, optimizer, 
-                num_epochs, device, scheduler=None):
+                num_epochs, device, scheduler=None, model_save_path='best_drone_visual_model.pth'):
     """Train the visual model"""
-    best_val_acc = 0.0
+    best_val_f1 = 0.0
     patience = 20
     patience_counter = 0
     
@@ -376,6 +379,8 @@ def train_model(model, train_loader, val_loader, criterion, optimizer,
         model.eval()
         val_correct = 0
         val_total = 0
+        val_preds = []
+        val_labels = []
         
         with torch.no_grad():
             for images, labels in val_loader:
@@ -384,22 +389,28 @@ def train_model(model, train_loader, val_loader, criterion, optimizer,
                 _, predicted = torch.max(outputs.data, 1)
                 val_total += labels.size(0)
                 val_correct += (predicted == labels).sum().item()
+                
+                val_preds.extend(predicted.cpu().numpy())
+                val_labels.extend(labels.cpu().numpy())
         
         val_acc = 100 * val_correct / val_total
         
+        # Calculate F1 score for validation
+        _, _, val_f1, _ = precision_recall_fscore_support(val_labels, val_preds, average='macro')
+        
         print(f"Epoch [{epoch+1}/{num_epochs}]")
         print(f"  Train Loss: {avg_loss:.4f} | Train Acc: {train_acc:.2f}%")
-        print(f"  Val Acc: {val_acc:.2f}%")
+        print(f"  Val Acc: {val_acc:.2f}% | Val F1: {val_f1:.4f}")
         
         # Learning rate scheduling
         if scheduler:
             scheduler.step()
         
-        # Save best model
-        if val_acc > best_val_acc:
-            best_val_acc = val_acc
-            torch.save(model.state_dict(), 'best_drone_visual_model.pth')
-            print(f"  ✓ Saved best model: {best_val_acc:.2f}%")
+        # Save best model based on F1
+        if val_f1 > best_val_f1:
+            best_val_f1 = val_f1
+            torch.save(model.state_dict(), model_save_path)
+            print(f"  ✓ Saved best model: F1 = {best_val_f1:.4f} -> {model_save_path}")
             patience_counter = 0
         else:
             patience_counter += 1
@@ -407,7 +418,7 @@ def train_model(model, train_loader, val_loader, criterion, optimizer,
                 print(f"Early stopping at epoch {epoch+1}")
                 break
     
-    return best_val_acc
+    return best_val_f1
 
 # ======================== MAIN ========================
 
@@ -417,8 +428,10 @@ def main():
     USE_MULTI_CHANNEL = False  # Set True for 3-channel representation
     MODEL_TYPE = 'resnet'  # 'simple' or 'resnet'
     
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    # Use absolute path to dataset so script works regardless of CWD
     if BINARY_MODE:
-        DATA_DIR = 'DroneAudioDataset/Binary_Drone_Audio'
+        DATA_DIR = os.path.join(script_dir, '..', 'DroneAudioDataset', 'Binary_Drone_Audio')
         LABEL_MAPPING = {'drone': 0, 'unknown': 1}
         NUM_CLASSES = 2
     else:
@@ -429,7 +442,7 @@ def main():
     # Hyperparameters
     TARGET_SIZE = (224, 224)  # Standard image size
     BATCH_SIZE = 16
-    NUM_EPOCHS = 25
+    NUM_EPOCHS = 100
     LEARNING_RATE = 0.001
     TEST_SIZE = 0.2
     VAL_SIZE = 0.1
@@ -448,6 +461,14 @@ def main():
     )
     
     print(f"\nDataset loaded: {len(images)} samples")
+    if len(images) == 0:
+        print("\nERROR: No samples found in dataset.")
+        print(f"  Expected dataset directory (binary mode): {DATA_DIR}")
+        print("  Make sure the dataset files are present and that class subfolders exist (e.g. 'drone', 'unknown').")
+        print("  You can also change working directory or adjust DATA_DIR in the script.")
+        return
+
+    # Safe access since we know dataset is non-empty
     print(f"Image shape: {images[0].shape}")
     print(f"Class distribution: {np.bincount(labels)}")
     
@@ -483,16 +504,26 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-4)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
     
+    # Prepare timestamped filenames
+    ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+    model_filename = f'best_drone_visual_model_{ts}.pth'
+    config_filename = f'visual_model_config_{ts}.pkl'
+    labelmap_filename = f'label_mapping_{ts}.pkl'
+    metrics_filename = f'visual_metrics_{ts}.json'
+    cm_image_filename = f'confusion_matrix_{ts}.png'
+
     # Train
     print("\nStarting training...")
-    best_acc = train_model(model, train_loader, val_loader, criterion, 
-                           optimizer, NUM_EPOCHS, device, scheduler)
+    best_f1 = train_model(model, train_loader, val_loader, criterion, 
+                           optimizer, NUM_EPOCHS, device, scheduler, model_save_path=model_filename)
     
     # Test
-    model.load_state_dict(torch.load('best_drone_visual_model.pth'))
+    model.load_state_dict(torch.load(model_filename))
     model.eval()
     correct = 0
     total = 0
+    all_preds = []
+    all_labels = []
     
     with torch.no_grad():
         for images, labels in test_loader:
@@ -501,11 +532,91 @@ def main():
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
+            
+            all_preds.extend(predicted.cpu().numpy())
+            all_labels.extend(labels.cpu().numpy())
     
     test_acc = 100 * correct / total
     print(f"\n{'='*60}")
     print(f"FINAL TEST ACCURACY: {test_acc:.2f}%")
     print(f"{'='*60}")
+    
+    # Calculate additional metrics
+    print("\nDetailed Classification Metrics:")
+    print("=" * 60)
+    
+    # Classification report
+    target_names = list(LABEL_MAPPING.keys())
+    report = classification_report(all_labels, all_preds, target_names=target_names, digits=4, output_dict=True)
+    # print readable report
+    print(classification_report(all_labels, all_preds, target_names=target_names, digits=4))
+    
+    # Confusion matrix
+    cm = confusion_matrix(all_labels, all_preds)
+    print("\nConfusion Matrix:")
+    print(cm)
+
+    # Save metrics to JSON
+    metrics = {
+        'timestamp': ts,
+        'test_accuracy': float(test_acc),
+        'classification_report': report,
+        'confusion_matrix': cm.tolist(),
+    }
+
+    # Add per-class precision/recall/f1/support into metrics (array form)
+    precision, recall, f1, support = precision_recall_fscore_support(all_labels, all_preds, average=None)
+    metrics['per_class'] = {}
+    for i, name in enumerate(target_names):
+        metrics['per_class'][name] = {
+            'precision': float(precision[i]),
+            'recall': float(recall[i]),
+            'f1': float(f1[i]),
+            'support': int(support[i])
+        }
+
+    # Macro and weighted averages
+    macro_precision, macro_recall, macro_f1, _ = precision_recall_fscore_support(all_labels, all_preds, average='macro')
+    weighted_precision, weighted_recall, weighted_f1, _ = precision_recall_fscore_support(all_labels, all_preds, average='weighted')
+    metrics['macro'] = {'precision': float(macro_precision), 'recall': float(macro_recall), 'f1': float(macro_f1)}
+    metrics['weighted'] = {'precision': float(weighted_precision), 'recall': float(weighted_recall), 'f1': float(weighted_f1)}
+
+    with open(metrics_filename, 'w', encoding='utf-8') as f:
+        json.dump(metrics, f, indent=2, ensure_ascii=False)
+
+    # Save confusion matrix as image
+    try:
+        plt.figure(figsize=(6,6))
+        plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+        plt.title('Confusion Matrix')
+        plt.colorbar()
+        tick_marks = np.arange(len(target_names))
+        plt.xticks(tick_marks, target_names, rotation=45)
+        plt.yticks(tick_marks, target_names)
+        plt.ylabel('True label')
+        plt.xlabel('Predicted label')
+        for i in range(cm.shape[0]):
+            for j in range(cm.shape[1]):
+                plt.text(j, i, cm[i, j], horizontalalignment='center', color='white' if cm[i, j] > cm.max()/2 else 'black')
+        plt.tight_layout()
+        plt.savefig(cm_image_filename, dpi=150, bbox_inches='tight')
+        plt.close()
+    except Exception as e:
+        print(f"Failed to save confusion matrix image: {e}")
+    
+    # Per-class metrics
+    precision, recall, f1, support = precision_recall_fscore_support(all_labels, all_preds, average=None)
+    print(f"\nPer-class Precision: {precision}")
+    print(f"Per-class Recall: {recall}")
+    print(f"Per-class F1-Score: {f1}")
+    print(f"Support: {support}")
+    
+    # Macro and weighted averages
+    macro_precision, macro_recall, macro_f1, _ = precision_recall_fscore_support(all_labels, all_preds, average='macro')
+    weighted_precision, weighted_recall, weighted_f1, _ = precision_recall_fscore_support(all_labels, all_preds, average='weighted')
+    
+    print(f"\nMacro Average - Precision: {macro_precision:.4f}, Recall: {macro_recall:.4f}, F1: {macro_f1:.4f}")
+    print(f"Weighted Average - Precision: {weighted_precision:.4f}, Recall: {weighted_recall:.4f}, F1: {weighted_f1:.4f}")
     
     # Save metadata
     config = {
@@ -516,10 +627,10 @@ def main():
         'num_classes': NUM_CLASSES
     }
     
-    with open('visual_model_config.pkl', 'wb') as f:
+    with open(config_filename, 'wb') as f:
         pickle.dump(config, f)
     
-    with open('label_mapping.pkl', 'wb') as f:
+    with open(labelmap_filename, 'wb') as f:
         pickle.dump(LABEL_MAPPING, f)
     
     print("\nFiles saved:")
