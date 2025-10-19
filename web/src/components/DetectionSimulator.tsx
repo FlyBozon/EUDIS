@@ -60,7 +60,7 @@ export const DetectionSimulator = () => {
     const numDrones = Math.max(1, Math.min(NUM_DRONES, Math.ceil(espNodes.length / 3)));
     dronesRef.current = Array.from({ length: numDrones }, initializeDrone);
 
-    const DETECTION_RANGE_METERS = 400; // Zasięg wykrywania drona
+    const DETECTION_RANGE_METERS = 200; // Zasięg wykrywania drona
     const DRONE_SPEED_M_PER_S = 20; // Szybsze drony (20 m/s ≈ 72 km/h)
     const UPDATE_INTERVAL_MS = 150; // Częstsze aktualizacje (150ms)
 

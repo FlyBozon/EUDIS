@@ -180,7 +180,7 @@ export const MapComponent = () => {
         fillOpacity: 0.7,
       }).addTo(mapRef.current!);
 
-      circle.bindPopup(`ESP Node: ${node.id}<br/>Line: ${node.lineId}`);
+      circle.bindPopup(`Czujnik: ${node.id}<br/>Trasa: ${node.lineId}`);
       layerRefsRef.current[`node-${node.id}`] = circle;
     });
 

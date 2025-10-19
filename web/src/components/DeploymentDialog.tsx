@@ -11,7 +11,7 @@ import { useAppStore } from '@/store/index';
 import { DeploymentLine } from '@/types/index';
 
 export const DeploymentDialog = () => {
-  const [spacing, setSpacing] = useState<300 | 500 | 1000>(500);
+  const [spacing, setSpacing] = useState<100 | 200 | 300>(200);
   const [isOpen, setIsOpen] = useState(false);
 
   const missionStartPoint = useAppStore((state) => state.missionStartPoint);
@@ -21,10 +21,10 @@ export const DeploymentDialog = () => {
   const clearMissionPoints = useAppStore((state) => state.clearMissionPoints);
 
   // Dane kosztów i wagi na podstawie rozstawu
-  const costAndWeightData: Record<300 | 500 | 1000, { costMin: number; costMax: number; weightMin: number; weightMax: number }> = {
-    300: { costMin: 530, costMax: 600, weightMin: 3.0, weightMax: 4.5 },
-    500: { costMin: 480, costMax: 550, weightMin: 2.6, weightMax: 4.0 },
-    1000: { costMin: 430, costMax: 500, weightMin: 2.2, weightMax: 3.7 },
+  const costAndWeightData: Record<100 | 200 | 300, { costMin: number; costMax: number; weightMin: number; weightMax: number }> = {
+    100: { costMin: 800, costMax: 950, weightMin: 4.5, weightMax: 5.5 },
+    200: { costMin: 600, costMax: 750, weightMin: 3.5, weightMax: 4.5 },
+    300: { costMin: 530, costMax: 600, weightMin: 3.0, weightMax: 4.0 },
   };
 
   // Funkcja pomocnicza do obliczenia dystansu w km
@@ -179,16 +179,16 @@ export const DeploymentDialog = () => {
 
           {/* Spacing Configuration */}
           <div className="space-y-3">
-            <label className="text-sm font-semibold block">Rozstaw sensorów ESP</label>
+            <label className="text-sm font-semibold block">Rozstaw czujników</label>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { value: 300, label: '300m', desc: 'Denser' },
-                { value: 500, label: '500m', desc: 'Standard' },
-                { value: 1000, label: '1000m', desc: 'Wide' },
+                { value: 100, label: '100m', desc: 'Dense' },
+                { value: 200, label: '200m', desc: 'Standard' },
+                { value: 300, label: '300m', desc: 'Wide' },
               ].map((option) => (
                 <button
                   key={option.value}
-                  onClick={() => setSpacing(option.value as 300 | 500 | 1000)}
+                  onClick={() => setSpacing(option.value as 100 | 200 | 300)}
                   className={`p-3 rounded-lg border-2 transition-all ${
                     spacing === option.value
                       ? 'bg-primary text-primary-foreground border-primary shadow-lg'
@@ -202,11 +202,11 @@ export const DeploymentDialog = () => {
             </div>
             {missionStartPoint && missionEndPoint ? (
               <p className="text-xs font-semibold text-foreground">
-                Liczba sensorów: <span className="text-primary">{sensorCount}</span>
+                Liczba czujników: <span className="text-primary">{sensorCount}</span>
               </p>
             ) : (
               <p className="text-xs text-muted-foreground">
-                Wybierz trasę aby zobaczyć liczbę sensorów
+                Wybierz trasę aby zobaczyć liczbę czujników
               </p>
             )}
           </div>
@@ -227,12 +227,12 @@ export const DeploymentDialog = () => {
                 </div>
                 
                 <div className="flex items-center justify-between text-muted-foreground">
-                  <span>Rozstaw ESP:</span>
+                  <span>Rozstaw czujników:</span>
                   <span className="font-semibold text-amber-600 dark:text-amber-400">{spacing} m</span>
                 </div>
                 
                 <div className="flex items-center justify-between text-muted-foreground">
-                  <span>Liczba sensorów:</span>
+                  <span>Liczba czujników:</span>
                   <span className="font-semibold text-amber-600 dark:text-amber-400">{sensorCount}</span>
                 </div>
 

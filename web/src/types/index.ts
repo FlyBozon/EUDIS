@@ -20,7 +20,7 @@ export interface DeploymentLine {
   startLng: number;
   endLat: number;
   endLng: number;
-  spacing: 300 | 500 | 1000; // meters
+  spacing: 100 | 200 | 300; // meters
   createdAt: number;
   costMin?: number; // PLN
   costMax?: number; // PLN
