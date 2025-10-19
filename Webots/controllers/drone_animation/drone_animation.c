@@ -390,7 +390,7 @@ int main(int argc, char **argv) {
             double pitch_shake = multiOctaveNoise(elapsed + 350.0, 3.2, 0.01, 2);
 
             const double follow_orient[4] = {
-                0.0, 1.0, 0.0, pitch_angle + 0.4 + pitch_shake
+                0.0, 1.0, 0.0, pitch_angle + 0 + pitch_shake
             };
             wb_supervisor_field_set_sf_rotation(main_rot, follow_orient);
 
@@ -422,7 +422,7 @@ int main(int argc, char **argv) {
             double pitch_shake = multiOctaveNoise(elapsed + 800.0, 3.3, 0.01, 2);
 
             const double front_orient[4] = {
-                0.0, 0.0, 1.0, M_PI - (pitch_angle + 0.4 + pitch_shake) + M_PI/6.0
+                -0.13, 0.0, 1.0, M_PI - (pitch_angle + 0.4 + pitch_shake) + M_PI/6.0
             };
             wb_supervisor_field_set_sf_rotation(main_rot, front_orient);
 
@@ -436,7 +436,7 @@ int main(int argc, char **argv) {
             const double ball_cam_pos[3] = {
                 ball_pos[0] - 0.3,
                 ball_pos[1] - 0.25,
-                ball_pos[2] + 0.15
+                ball_pos[2] + 0.05
             };
             wb_supervisor_field_set_sf_vec3f(main_trans, ball_cam_pos);
 
@@ -452,7 +452,7 @@ int main(int argc, char **argv) {
             // Calculate yaw )
             double yaw_angle = atan2(dy_ball, dx_ball);
             double pitch_angle = atan2(-dz_ball, sqrt(dx_ball*dx_ball + dy_ball*dy_ball));
-            pitch_angle -= 20.0 * M_PI / 180.0;
+            pitch_angle -= 1.0 * M_PI / 180.0;
 
             const double ball_orient[4] = {
                 -sin(pitch_angle) * sin(yaw_angle),
