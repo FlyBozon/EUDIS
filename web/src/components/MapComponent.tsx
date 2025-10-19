@@ -29,7 +29,7 @@ export const MapComponent = () => {
   
   const layerRefsRef = useRef<{ [key: string]: L.Polyline | L.CircleMarker | L.Marker | L.Circle | L.DivIcon }>({});
 
-  
+  // Funkcja do wyszukiwania lokalizacji
   const handleSearch = async (query: string) => {
     if (searchDebounceRef.current) {
       clearTimeout(searchDebounceRef.current);
@@ -43,7 +43,7 @@ export const MapComponent = () => {
 
     searchDebounceRef.current = setTimeout(async () => {
       try {
-        
+        // cancel previous request if any
         if (searchAbortRef.current) {
           searchAbortRef.current.abort();
         }
@@ -51,22 +51,22 @@ export const MapComponent = () => {
         searchAbortRef.current = controller;
 
         const response = await fetch(
-          `https:
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=pl&limit=10`,
           { signal: controller.signal }
         );
         const data = await response.json();
         
-        
+        // Usuń duplikaty (te same koordynaty) - często są 2 źródła w OSM
         const uniqueResults = data.filter((item: any, index: number, self: any[]) => 
           index === self.findIndex((t) => 
             Math.abs(parseFloat(t.lat) - parseFloat(item.lat)) < 0.0001 && 
             Math.abs(parseFloat(t.lon) - parseFloat(item.lon)) < 0.0001
           )
-        ).slice(0, 5); 
+        ).slice(0, 5); // Ogranicz do 5 po usunięciu duplikatów
         
         setSearchResults(uniqueResults);
         setShowSearchResults(true);
-        setSelectedResultIndex(0); 
+        setSelectedResultIndex(0); // Automatycznie zaznacz pierwszy wynik
       } catch (error) {
         if ((error as any)?.name !== 'AbortError') {
           console.error('Search failed:', error);
@@ -76,7 +76,7 @@ export const MapComponent = () => {
     }, 500);
   };
 
-  
+  // Cleanup pending debounce/requests on unmount
   useEffect(() => {
     return () => {
       if (searchDebounceRef.current) {
@@ -88,7 +88,7 @@ export const MapComponent = () => {
     };
   }, []);
 
-  
+  // Funkcja do zbliżenia do wybranej lokalizacji
   const handleLocationSelect = (lat: number, lon: number) => {
     if (mapRef.current) {
       mapRef.current.setView([lat, lon], 13);
@@ -99,7 +99,7 @@ export const MapComponent = () => {
     }
   };
 
-  
+  // Obsługa klawiatury dla wyników wyszukiwania
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!showSearchResults || searchResults.length === 0) return;
 
@@ -130,30 +130,30 @@ export const MapComponent = () => {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    
+    // Initialize map centered on Poland
     if (!mapRef.current) {
       mapRef.current = L.map(containerRef.current, {
-        zoomControl: false, 
+        zoomControl: false, // Wyłączam domyślny zoom
       }).setView([52.0, 19.0], 6);
 
-      L.tileLayer('https:
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 19,
       }).addTo(mapRef.current);
 
-      
+      // Dodaję zoom kontrolkę w lewym dolnym rogu
       L.control.zoom({
         position: 'bottomleft',
       }).addTo(mapRef.current);
     }
 
-    
+    // Clear previous layers
     Object.values(layerRefsRef.current).forEach((layer) => {
       mapRef.current?.removeLayer(layer);
     });
     layerRefsRef.current = {};
 
-    
+    // Draw deployment lines
     deploymentLines.forEach((line) => {
       const polyline = L.polyline(
         [
@@ -171,7 +171,7 @@ export const MapComponent = () => {
       layerRefsRef.current[`line-${line.id}`] = polyline;
     });
 
-    
+    // Draw ESP nodes
     espNodes.forEach((node) => {
       const circle = L.circleMarker([node.latitude, node.longitude], {
         radius: 6,
@@ -186,7 +186,7 @@ export const MapComponent = () => {
       layerRefsRef.current[`node-${node.id}`] = circle;
     });
 
-    
+    // Draw detections with animation
     detections.forEach((detection) => {
       const node = espNodes.find((n) => n.id === detection.lineId);
       if (node) {
@@ -206,12 +206,12 @@ export const MapComponent = () => {
       }
     });
 
-    
+    // Draw mission planning points
     if (missionStartPoint) {
       const startMarker = L.marker(missionStartPoint, {
         icon: L.icon({
-          iconUrl: 'https:
-          shadowUrl: 'https:
+          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
           iconSize: [25, 41],
           iconAnchor: [12, 41],
           popupAnchor: [1, -34],
@@ -225,8 +225,8 @@ export const MapComponent = () => {
     if (missionEndPoint) {
       const endMarker = L.marker(missionEndPoint, {
         icon: L.icon({
-          iconUrl: 'https:
-          shadowUrl: 'https:
+          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
           iconSize: [25, 41],
           iconAnchor: [12, 41],
           popupAnchor: [1, -34],
@@ -237,7 +237,7 @@ export const MapComponent = () => {
       layerRefsRef.current[`mission-end`] = endMarker;
     }
 
-    
+    // Draw line between start and end points if both exist
     if (missionStartPoint && missionEndPoint) {
       const line = L.polyline([missionStartPoint, missionEndPoint], {
         color: '#10b981',
@@ -248,9 +248,9 @@ export const MapComponent = () => {
       layerRefsRef.current[`mission-line`] = line;
     }
 
-    
+    // Draw all drone positions
     dronePositions.forEach((position, index) => {
-      
+      // Zasięg wykrywania (400m)
       const detectionRangeCircle = L.circle(position, {
         radius: 400,
         fillColor: '#8b5cf6',
@@ -261,7 +261,7 @@ export const MapComponent = () => {
       }).addTo(mapRef.current!);
       layerRefsRef.current[`drone-range-${index}`] = detectionRangeCircle;
 
-      
+      // Ikona drona
       const droneMarker = L.marker(position, {
         icon: L.divIcon({
           className: 'drone-marker',
@@ -291,7 +291,7 @@ export const MapComponent = () => {
       layerRefsRef.current[`drone-marker-${index}`] = droneMarker;
     });
 
-    
+    // Update cursor based on selection mode
     if (mapRef.current) {
       if (isSelectingMode) {
         mapRef.current.getContainer().style.cursor = selectionStep === 'start' 
@@ -303,7 +303,7 @@ export const MapComponent = () => {
     }
   }, [deploymentLines, espNodes, detections, dronePositions, missionStartPoint, missionEndPoint, isSelectingMode, selectionStep]);
 
-  
+  // Handle map clicks for mission planning
   useEffect(() => {
     if (!mapRef.current || !isSelectingMode || !selectionStep) return;
 
@@ -327,7 +327,7 @@ export const MapComponent = () => {
     };
   }, [isSelectingMode, selectionStep]);
 
-  
+  // Fullscreen handler
   const toggleFullscreen = () => {
     const mapContainer = containerRef.current?.parentElement;
     if (!mapContainer) return;
@@ -335,7 +335,7 @@ export const MapComponent = () => {
     if (!document.fullscreenElement) {
       mapContainer.requestFullscreen().then(() => {
         setIsFullscreen(true);
-        
+        // Wymuszenie ponownego renderowania mapy po zmianie rozmiaru
         setTimeout(() => {
           mapRef.current?.invalidateSize();
         }, 100);
@@ -345,7 +345,7 @@ export const MapComponent = () => {
     } else {
       document.exitFullscreen().then(() => {
         setIsFullscreen(false);
-        
+        // Wymuszenie ponownego renderowania mapy po zmianie rozmiaru
         setTimeout(() => {
           mapRef.current?.invalidateSize();
         }, 100);
@@ -353,11 +353,11 @@ export const MapComponent = () => {
     }
   };
 
-  
+  // Nasłuchiwanie na zmiany fullscreen (np. gdy użytkownik wciśnie ESC)
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
-      
+      // Wymuszenie ponownego renderowania mapy
       setTimeout(() => {
         mapRef.current?.invalidateSize();
       }, 100);
@@ -376,7 +376,7 @@ export const MapComponent = () => {
         className="w-full h-full rounded-lg border border-border overflow-hidden"
       />
       
-      { }
+      {/* Search Bar - Top Left */}
       <div className="absolute top-4 left-4 z-40 w-72">
         <div className="relative">
           <div className="flex items-center bg-card border border-border rounded-lg shadow-lg px-3 py-2">
@@ -409,7 +409,7 @@ export const MapComponent = () => {
             )}
           </div>
           
-          { }
+          {/* Fullscreen Button */}
           <button
             onClick={toggleFullscreen}
             className="absolute -right-14 top-0 p-2 bg-card border border-border rounded-lg shadow-lg hover:bg-accent transition-colors"
@@ -417,17 +417,17 @@ export const MapComponent = () => {
             title={isFullscreen ? `${t.map.exitFullscreen} (ESC)` : t.map.fullscreen}
           >
             {isFullscreen ? (
-              <svg xmlns="http:
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
               </svg>
             ) : (
-              <svg xmlns="http:
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
               </svg>
             )}
           </button>
 
-          { }
+          {/* Search Results Dropdown */}
           {showSearchResults && searchResults.length > 0 && (
             <div className="absolute top-full mt-2 w-full bg-card border border-border rounded-lg shadow-lg overflow-hidden z-50">
               {searchResults.map((result, index) => (
@@ -460,7 +460,7 @@ export const MapComponent = () => {
         </div>
       </div>
 
-      { }
+      {/* Main Control Button - Top Right */}
       {!isSelectingMode && !missionStartPoint && !missionEndPoint && (
         <div className="absolute top-4 right-4 z-40">
           <button
@@ -475,11 +475,11 @@ export const MapComponent = () => {
         </div>
       )}
 
-      { }
+      {/* Stepper - Selection Mode */}
       {isSelectingMode && (
         <div className="absolute top-4 right-4 z-40">
           <div className="bg-card border border-border rounded-lg shadow-lg p-4 w-72">
-            { }
+            {/* Header */}
               <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-base">{t.map.planRoute}</h3>
               <button
@@ -494,9 +494,9 @@ export const MapComponent = () => {
               </button>
             </div>
 
-            { }
+            {/* Stepper Steps */}
             <div className="space-y-4">
-              { }
+              {/* Step 1 - Start Point */}
               <div className="flex gap-3">
                 <div className="flex flex-col items-center">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-all ${
@@ -526,7 +526,7 @@ export const MapComponent = () => {
                 </div>
               </div>
 
-              { }
+              {/* Step 2 - End Point */}
               <div className="flex gap-3">
                 <div className="flex flex-col items-center">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-all ${
@@ -560,7 +560,7 @@ export const MapComponent = () => {
               </div>
             </div>
 
-            { }
+            {/* Distance Display */}
             {missionStartPoint && missionEndPoint && (
               <div className="mt-4 pt-4 border-t border-border">
                 <div className="text-xs text-muted-foreground">{t.deploymentDialog.distance}:</div>
@@ -573,7 +573,7 @@ export const MapComponent = () => {
               </div>
             )}
 
-            { }
+            {/* Action Buttons */}
             <div className="mt-4 flex gap-2">
               <button
                 onClick={() => {
@@ -600,7 +600,7 @@ export const MapComponent = () => {
         </div>
       )}
 
-      { }
+      {/* Mission Points Summary - Bottom Left (when not in selection mode) */}
       {(missionStartPoint || missionEndPoint) && !isSelectingMode && (
         <div className="absolute bottom-4 left-4 z-40">
           <div className="bg-card border border-border rounded-lg shadow-lg p-3 space-y-2 w-72">
