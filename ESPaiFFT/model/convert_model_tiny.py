@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Konwersja lekkiego modelu audio (DS-CNN) do TFLite INT8 dla ESP32-S3.
 
@@ -36,8 +35,6 @@ def build_tiny_dscnn():
     x = depthwise_separable(x, 32, stride=2)
     x = depthwise_separable(x, 48, stride=2)
     x = depthwise_separable(x, 64, stride=2)
-    # końcowe rozmiary po kolejnych stride=2: 96->48->24->12->6->3
-    # użyj AveragePooling2D(3x3), aby zredukować do 1x1 (obsługiwane przez TFLM jako AVERAGEPOOL2D)
     x = tf.keras.layers.AveragePooling2D(pool_size=3)(x)
     x = tf.keras.layers.Flatten()(x)
     outputs = tf.keras.layers.Dense(NUM_CLASSES, activation='softmax')(x)
@@ -79,15 +76,8 @@ def generate_header(tflite_model: bytes, out_path='drone_model.h'):
 // Input: [1, {INPUT_SHAPE[0]}, {INPUT_SHAPE[1]}, 1] INT8
 // Output: [1, {NUM_CLASSES}] INT8
 
-#ifndef DRONE_MODEL_H
-#define DRONE_MODEL_H
 
-#include <stdint.h>
-#include <Arduino.h>
 
-#define DRONE_MODEL_SEGMENTS {len(segments)}
-#define DRONE_MODEL_SEGMENT_SIZE {SEG}
-#define DRONE_MODEL_TOTAL_SIZE {len(tflite_model)}
 
 """
     for i, seg in enumerate(segments):
@@ -121,7 +111,6 @@ uint8_t* load_drone_model_to_psram() {{
     return buf;
 }}
 
-#endif
 """
     with open(out_path, 'w') as f:
         f.write(c)

@@ -8,9 +8,6 @@ import librosa
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
-# ======================================================
-# CONFIG
-# ======================================================
 SAMPLE_RATE = 16000
 N_MFCC = 13
 N_FFT = 1024
@@ -21,35 +18,27 @@ LR = 1e-3
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
-# ======================================================
-# FEATURE EXTRACTION
-# ======================================================
 def extract_features(filepath):
     """Extract MFCC, FFT magnitude, and spectrogram mean features from an audio file."""
     try:
         y, sr = librosa.load(filepath, sr=SAMPLE_RATE, mono=True)
 
-        # Ensure consistent length (3s)
         max_len = 3 * SAMPLE_RATE
         if len(y) < max_len:
             y = np.pad(y, (0, max_len - len(y)))
         else:
             y = y[:max_len]
 
-        # MFCC
         mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=N_MFCC)
         mfcc_mean = np.mean(mfcc, axis=1)
 
-        # Spectrogram
         spec = np.abs(librosa.stft(y, n_fft=N_FFT, hop_length=HOP_LENGTH))
         spec_mean = np.mean(spec, axis=1)
 
-        # FFT (magnitude up to 1000 Hz)
         fft_vals = np.abs(np.fft.rfft(y))
         fft_vals = fft_vals[:1000]
         fft_mean = np.mean(fft_vals)
 
-        # Concatenate all features
         features = np.concatenate([mfcc_mean, spec_mean, [fft_mean]])
         return features
     except Exception as e:
@@ -57,9 +46,6 @@ def extract_features(filepath):
         return None
 
 
-# ======================================================
-# DATASET
-# ======================================================
 class FolderAudioDataset(Dataset):
     def __init__(self, root_dir):
         self.filepaths = []
@@ -76,7 +62,6 @@ class FolderAudioDataset(Dataset):
 
         print(f"Loaded {len(self.filepaths)} files from {len(self.classes)} classes: {self.classes}")
 
-        # Extract all features
         all_features = []
         valid_labels = []
         for fp, label in zip(self.filepaths, self.labels):
@@ -85,7 +70,6 @@ class FolderAudioDataset(Dataset):
                 all_features.append(feat)
                 valid_labels.append(label)
 
-        # Normalize
         self.scaler = StandardScaler()
         self.features = self.scaler.fit_transform(all_features)
         self.labels = np.array(valid_labels)
@@ -99,9 +83,6 @@ class FolderAudioDataset(Dataset):
         return x, y
 
 
-# ======================================================
-# MODEL
-# ======================================================
 class DroneNN(nn.Module):
     def __init__(self, input_dim, num_classes):
         super().__init__()
@@ -120,9 +101,6 @@ class DroneNN(nn.Module):
         return self.net(x)
 
 
-# ======================================================
-# TRAIN LOOP
-# ======================================================
 def train_model(model, train_loader, val_loader, optimizer, criterion):
     for epoch in range(EPOCHS):
         model.train()
@@ -144,7 +122,6 @@ def train_model(model, train_loader, val_loader, optimizer, criterion):
         acc = correct / total
         print(f"Epoch [{epoch+1}/{EPOCHS}] Loss: {total_loss/len(train_loader):.4f} | Train Acc: {acc:.4f}")
 
-        # Validation
         model.eval()
         val_correct, val_total = 0, 0
         with torch.no_grad():
@@ -158,9 +135,6 @@ def train_model(model, train_loader, val_loader, optimizer, criterion):
         print(f"Validation Acc: {val_acc:.4f}\n")
 
 
-# ======================================================
-# MAIN
-# ======================================================
 def main(dataset_path):
     dataset = FolderAudioDataset(dataset_path)
     X_train, X_val, y_train, y_val = train_test_split(dataset.features, dataset.labels, test_size=0.2, random_state=42)
@@ -194,7 +168,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     dataset_path = sys.argv[1]
-    dataset = FolderAudioDataset(dataset_path)  # create dataset first
+    dataset = FolderAudioDataset(dataset_path)
 
     X_train, X_val, y_train, y_val = train_test_split(
         dataset.features, dataset.labels, test_size=0.2, random_state=42
@@ -222,6 +196,6 @@ if __name__ == "__main__":
     train_model(model, train_loader, val_loader, optimizer, criterion)
 
     torch.save(model.state_dict(), "drone_model.pth")
-    joblib.dump(dataset.scaler, "scaler.save")   # ✅ correct reference
+    joblib.dump(dataset.scaler, "scaler.save")
     print(f"✅ Model saved (classes: {dataset.classes})")
     print("✅ Scaler saved as scaler.save")

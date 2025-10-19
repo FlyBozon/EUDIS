@@ -20,7 +20,6 @@ typedef struct {
     double signal_strength;
 } Sensor;
 
-// Detection zone visualization
 typedef struct {
     WbNodeRef zone_node;
     double center[3];
@@ -28,17 +27,15 @@ typedef struct {
     bool visible;
 } DetectionZone;
 
-// Calculate signal strength
 double calculate_signal_strength(double distance) {
     if (distance > SENSOR_RANGE) {
         return 0.0;
     }
-    // Normalize: 1.0 at distance 0, 0.0 at SENSOR_RANGE
+    
     double normalized_dist = distance / SENSOR_RANGE;
     return 1.0 - (normalized_dist * normalized_dist);
 }
 
-//  distance between two 3D points
 double distance_3d(const double p1[3], const double p2[3]) {
     double dx = p2[0] - p1[0];
     double dy = p2[1] - p1[1];
@@ -46,7 +43,6 @@ double distance_3d(const double p1[3], const double p2[3]) {
     return sqrt(dx*dx + dy*dy + dz*dz);
 }
 
-// Estimate detection zone
 void estimate_detection_zone(const Sensor *sensor1, const Sensor *sensor2,
                             double drone_pos[3], double *zone_radius) {
     double sensor_distance = distance_3d(sensor1->position, sensor2->position);
@@ -56,7 +52,7 @@ void estimate_detection_zone(const Sensor *sensor1, const Sensor *sensor2,
     double dx = sensor2->position[0] - sensor1->position[0];
     double dy = sensor2->position[1] - sensor1->position[1];
 
-    // Check if solution is valid
+    
     if (sensor_distance < 0.1) {
         drone_pos[0] = sensor1->position[0];
         drone_pos[1] = sensor1->position[1];
@@ -65,7 +61,7 @@ void estimate_detection_zone(const Sensor *sensor1, const Sensor *sensor2,
         return;
     }
 
-    // a = (r1² - r2² + d²) / (2d)
+    
     double a = (dist1*dist1 - dist2*dist2 + sensor_distance*sensor_distance) / (2.0 * sensor_distance);
 
     double h_squared = dist1*dist1 - a*a;
@@ -74,10 +70,10 @@ void estimate_detection_zone(const Sensor *sensor1, const Sensor *sensor2,
     drone_pos[0] = sensor1->position[0] + a * dx / sensor_distance;
     drone_pos[1] = sensor1->position[1] + a * dy / sensor_distance;
 
-    // Altitude known (from drone signature)
+    
     drone_pos[2] = DRONE2_ALTITUDE;
     *zone_radius = h + 10.0;
     if (*zone_radius < 5.0) *zone_radius = 5.0;
 }
 
-#endif // SENSOR_DETECTION_H
+#endif 

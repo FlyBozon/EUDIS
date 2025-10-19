@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import pickle
 import torch
 
@@ -6,7 +5,6 @@ print("="*60)
 print("Inspecting model configuration and weights")
 print("="*60)
 
-# Load config
 with open('visual_model_config.pkl', 'rb') as f:
     config = pickle.load(f)
 
@@ -19,13 +17,12 @@ for key, value in config.items():
     else:
         print(f"  {key}: {value}")
 
-# Load weights
 print("\n[MODEL WEIGHTS]")
 model_state = torch.load('best_drone_visual_model.pth', map_location='cpu')
 
 if isinstance(model_state, dict):
     print(f"  Type: Dictionary with {len(model_state)} keys")
-    for key in list(model_state.keys())[:10]:  # First 10 keys
+    for key in list(model_state.keys())[:10]:
         if isinstance(model_state[key], torch.Tensor):
             print(f"  {key}: shape={model_state[key].shape}, dtype={model_state[key].dtype}")
         else:

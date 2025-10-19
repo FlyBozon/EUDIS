@@ -5,9 +5,6 @@ from matplotlib.animation import FuncAnimation
 import scipy.signal as sps
 import time, os
 
-# ===============================
-# PARAMETRY
-# ===============================
 SR = 44100
 BLOCK = 1024
 LOW, HIGH = 50, 1000
@@ -16,9 +13,6 @@ OUTPUT_DIR = "detections"
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# ===============================
-# NARZĘDZIA DSP
-# ===============================
 def bandpass_filter(x, sr, low, high, order=4):
     nyq = sr / 2
     b, a = sps.butter(order, [low / nyq, high / nyq], btype='band')
@@ -36,7 +30,6 @@ def compute_features(sig, sr, bg_spectrum=None):
     band = (freqs >= LOW) & (freqs <= HIGH)
     band_mag = mag[band]
 
-    # Feature: energia + harmonicity + flatness
     rms = np.sqrt(np.mean(sig ** 2))
     peaks, _ = sps.find_peaks(band_mag, height=np.max(band_mag) * 0.3, distance=8)
     harmonicity = len(peaks)
@@ -46,13 +39,11 @@ def compute_features(sig, sr, bg_spectrum=None):
     return score, rms, harmonicity, flatness, freqs, mag
 
 def compute_drone_features(sig, sr, bg_spectrum=None):
-    # FFT
     N = len(sig)
     fft_vals = np.fft.rfft(sig * np.hanning(N))
     freqs = np.fft.rfftfreq(N, 1 / sr)
     mag = np.abs(fft_vals)
 
-    # odejmij tło
     if bg_spectrum is not None:
         mag = np.maximum(mag - bg_spectrum, 0)
 
@@ -60,27 +51,22 @@ def compute_drone_features(sig, sr, bg_spectrum=None):
     band_mag = mag[band]
     band_freqs = freqs[band]
 
-    # Harmonic peaks
     peaks, _ = sps.find_peaks(band_mag, height=np.max(band_mag)*0.3, distance=10)
     harmonicity = len(peaks)
-    # Sprawdź regularność odległości między pikami
     if len(peaks) > 1:
         distances = np.diff(peaks)
-        harmonicity_score = 1 / (np.std(distances)+1e-6)  # im bardziej regularne, tym większy score
+        harmonicity_score = 1 / (np.std(distances)+1e-6)
     else:
         harmonicity_score = 0
 
-    # Spectral flatness (tonalność)
     eps = 1e-10
     flatness = np.exp(np.mean(np.log(band_mag + eps))) / (np.mean(band_mag) + eps)
-    tonal_score = 1 - flatness  # im mniej płaskie, tym bardziej tonalny
+    tonal_score = 1 - flatness
 
-    # Cepstrum - periodicity
     ceps = np.fft.irfft(np.log(band_mag + eps))
     peak_ceps = np.max(np.abs(ceps[1:int(len(ceps)/2)]))
     periodicity_score = peak_ceps
 
-    # finalny score
     score = harmonicity_score*0.5 + tonal_score*0.3 + periodicity_score*0.2
     return score, harmonicity_score, tonal_score, periodicity_score
 
@@ -88,16 +74,12 @@ def compute_drone_features(sig, sr, bg_spectrum=None):
 def is_drone(score, threshold=0.1):
     return score > threshold
 
-# ===============================
-# REAL-TIME DETEKTOR
-# ===============================
 def live_drone_detector():
     buffer = np.zeros(int(SR * 5))
     bg_spectrum = None
     start_time = time.time()
     detections = []
 
-    # przygotuj wykres
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.set_ylim(0, HIGH)
     ax.set_xlabel("Czas [s]")
@@ -108,7 +90,6 @@ def live_drone_detector():
     detected_text = ax.text(0.02, 0.95, '', transform=ax.transAxes,
                             color='red', fontsize=14, fontweight='bold')
 
-    # callback dźwięku
     def audio_callback(indata, frames, time_info, status):
         nonlocal buffer
         buffer = np.roll(buffer, -frames)
@@ -117,13 +98,12 @@ def live_drone_detector():
     stream = sd.InputStream(callback=audio_callback, channels=1, samplerate=SR, blocksize=BLOCK)
 
     def update(frame):
-        nonlocal bg_spectrum, spec_img  # <- konieczne!
-        
+        nonlocal bg_spectrum, spec_img
+
         elapsed = time.time() - start_time
         sig = buffer[-int(WINDOW_SEC * SR):]
         sig_f = bandpass_filter(sig, SR, LOW, HIGH)
 
-        # uczymy się tła
         if 2 < elapsed < 7:
             fft_bg_new = np.abs(np.fft.rfft(sig_f * np.hanning(len(sig_f))))
             if bg_spectrum is None:
@@ -131,22 +111,19 @@ def live_drone_detector():
             else:
                 bg_spectrum = 0.9 * bg_spectrum + 0.1 * fft_bg_new
 
-        # oblicz cechy drona
         score, harmonicity_score, tonal_score, periodicity_score = compute_drone_features(sig_f, SR, bg_spectrum)
 
-        # spektrogram
         Pxx, freqs_spec, bins, im = ax.specgram(sig_f, NFFT=1024, Fs=SR, noverlap=512, cmap='magma')
         if spec_img is None:
             spec_img = im
         else:
-            spec_img.set_array(10*np.log10(Pxx+1e-10))  # aktualizacja danych
+            spec_img.set_array(10*np.log10(Pxx+1e-10))
 
         ax.set_ylim(0, HIGH)
         ax.set_xlabel("Czas [s]")
         ax.set_ylabel("Częstotliwość [Hz]")
         ax.set_title("Spektrogram na żywo + detekcja drona")
 
-        # decyzja
         if is_drone(score):
             msg = (f"🚁 DRON wykryty! score={score:.3f} | "
                 f"H={harmonicity_score:.2f} T={tonal_score:.2f} P={periodicity_score:.2f}")
@@ -154,7 +131,6 @@ def live_drone_detector():
             detected_text.set_text(msg)
             detected_text.set_color('red')
 
-            # zapisz obrazek z momentem wykrycia
             timestamp = time.strftime("%Y%m%d_%H%M%S")
             save_path = os.path.join(OUTPUT_DIR, f"detection_{timestamp}.png")
             plt.savefig(save_path, dpi=200)
@@ -171,7 +147,6 @@ def live_drone_detector():
     with stream:
         plt.show()
 
-    # Po zakończeniu — zapis wyników tekstowych
     if detections:
         txt_path = os.path.join(OUTPUT_DIR, "detections.txt")
         with open(txt_path, "w") as f:

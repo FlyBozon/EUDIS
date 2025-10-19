@@ -5,7 +5,7 @@ import time
 
 SAMPLE_RATE = 44100
 CHANNELS = 1
-SAMPLE_WIDTH = 2  # 16-bit = 2 bytes
+SAMPLE_WIDTH = 2
 RECORD_SECONDS = 10
 GAIN = 20.0
 

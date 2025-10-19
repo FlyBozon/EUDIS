@@ -3,55 +3,45 @@
 #include <Adafruit_NeoPixel.h>
 #include "arduinoFFT.h"
 
-// I2S Pin Configuration for XIAO RP2040
-#define I2S_SCK   6   // GPIO6  (D4) - Serial Clock (BCLK)
-#define I2S_WS    7   // GPIO7  (D5) - Word Select (LRCLK)
-#define I2S_SD    4   // GPIO4  (D9) - Serial Data (DIN)
+#define I2S_SCK   6   
+#define I2S_WS    7   
+#define I2S_SD    4   
 
-// Audio Configuration
 #define SAMPLE_RATE 44100
 #define BITS_PER_SAMPLE 16
 #define BUFFER_SIZE 512
 
-// FFT Configuration
-#define FFT_SIZE 1024  // Smaller for faster processing
-#define FFT_OVERLAP (FFT_SIZE / 2)  // 50% overlap
+#define FFT_SIZE 1024  
+#define FFT_OVERLAP (FFT_SIZE / 2)  
 
-// NeoPixel Configuration
 #define NEOPIXEL_PIN 12
 #define NUM_PIXELS 1
 
-// Detection Configuration
 #define NUM_PROFILES 9
-#define HISTORY_SIZE 7  // Track last 7 detections
-#define MIN_SNR 3.5     // Minimum signal-to-noise ratio
-#define MIN_DETECTIONS 4  // Require 4/7 consistent detections
+#define HISTORY_SIZE 7  
+#define MIN_SNR 3.5     
+#define MIN_DETECTIONS 4  
 #define NOISE_CALIBRATION_SAMPLES 20
 
-// Timing Configuration
 const unsigned long PING_INTERVAL_MS = 250;
 const unsigned long DRONE_ALERT_DURATION = 5000;
 const unsigned long LOUD_DURATION = 750;
 const unsigned long CONNECTION_TIMEOUT = 3000;
 
-// Global Objects
 I2S i2s(INPUT);
 Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 ArduinoFFT<float> FFT = ArduinoFFT<float>();
 
-// Audio Buffers
 int16_t audioBuffer[BUFFER_SIZE];
 float fftBuffer[FFT_SIZE];
 float vReal[FFT_SIZE];
 float vImag[FFT_SIZE];
 int fftBufferIdx = 0;
 
-// Noise Floor
 float noiseFloor[FFT_SIZE/2];
 float noiseStdDev[FFT_SIZE/2];
 bool noiseCalibrated = false;
 
-// Drone Profile Structure
 struct DroneProfile {
   const char* name;
   float fundamental_freq;
@@ -60,10 +50,9 @@ struct DroneProfile {
   int num_harmonics;
   float harmonic_tolerance;
   float confidence_threshold;
-  float min_duration_ms;  // Minimum detection duration
+  float min_duration_ms;  
 };
 
-// Detection History
 struct DetectionHistory {
   int profileIdx;
   float confidence;
@@ -73,7 +62,6 @@ struct DetectionHistory {
 DetectionHistory history[HISTORY_SIZE];
 int historyIdx = 0;
 
-// Timing Variables
 unsigned long lastPingTime = 0;
 unsigned long lastPongTime = 0;
 unsigned long lastLoudTime = 0;
@@ -83,13 +71,11 @@ unsigned long lastStatusUpdate = 0;
 unsigned long lastMaxReset = 0;
 unsigned long detectionStartTime = 0;
 
-// State Variables
 bool recording = true;
 float maxVolume = 0;
 int consecutiveDetections = 0;
 int lastDetectedProfile = -1;
 
-// Drone Harmonic Arrays
 float harmonics_1[] = {2275.0};
 float harmonics_2[] = {1750.0};
 float harmonics_3[] = {2046.0};
@@ -100,7 +86,6 @@ float harmonics_7[] = {139.0, 223.5};
 float harmonics_8[] = {};
 float harmonics_9[] = {250.5, 287.5};
 
-// Drone Profiles with optimized parameters
 DroneProfile profiles[NUM_PROFILES] = {
   {"Dron_1", 1143.0, 12.0, harmonics_1, 1, 25.0, 0.65, 500},
   {"Dron_3", 886.5, 12.0, harmonics_2, 1, 25.0, 0.65, 500},
@@ -113,24 +98,21 @@ DroneProfile profiles[NUM_PROFILES] = {
   {"Dron_9", 107.5, 10.0, harmonics_9, 2, 20.0, 0.70, 600}
 };
 
-// ============================================================================
-// NOISE CALIBRATION
-// ============================================================================
 void calibrateNoiseFloor() {
   Serial.println("\n🔧 Starting noise floor calibration...");
   Serial.println("   Please keep environment QUIET for 10 seconds!");
   
-  // Initialize arrays
+  
   for (int i = 0; i < FFT_SIZE/2; i++) {
     noiseFloor[i] = 0;
     noiseStdDev[i] = 0;
   }
   
-  // Collect multiple FFT samples
+  
   float samples[NOISE_CALIBRATION_SAMPLES][FFT_SIZE/2];
   
   for (int sample = 0; sample < NOISE_CALIBRATION_SAMPLES; sample++) {
-    // Fill buffer with audio
+    
     int samplesCollected = 0;
     while (samplesCollected < FFT_SIZE) {
       if (i2s.available()) {
@@ -142,23 +124,23 @@ void calibrateNoiseFloor() {
       }
     }
     
-    // Apply Hamming window
+    
     for (int i = 0; i < FFT_SIZE; i++) {
       float window = 0.54 - 0.46 * cos(2.0 * PI * i / (FFT_SIZE - 1));
       vReal[i] *= window;
     }
     
-    // Compute FFT
+    
     FFT.compute(vReal, vImag, FFT_SIZE, FFTDirection::Forward);
     FFT.complexToMagnitude(vReal, vImag, FFT_SIZE);
     
-    // Store magnitudes
+    
     for (int i = 0; i < FFT_SIZE/2; i++) {
       samples[sample][i] = vReal[i];
       noiseFloor[i] += vReal[i];
     }
     
-    // Progress indicator
+    
     if (sample % 5 == 0) {
       Serial.print(".");
     }
@@ -168,12 +150,12 @@ void calibrateNoiseFloor() {
   
   Serial.println();
   
-  // Calculate mean
+  
   for (int i = 0; i < FFT_SIZE/2; i++) {
     noiseFloor[i] /= NOISE_CALIBRATION_SAMPLES;
   }
   
-  // Calculate standard deviation
+  
   for (int sample = 0; sample < NOISE_CALIBRATION_SAMPLES; sample++) {
     for (int i = 0; i < FFT_SIZE/2; i++) {
       float diff = samples[sample][i] - noiseFloor[i];
@@ -198,9 +180,6 @@ void calibrateNoiseFloor() {
   Serial.println(avgNoise, 2);
 }
 
-// ============================================================================
-// FFT FREQUENCY ANALYSIS
-// ============================================================================
 float getFrequencyMagnitude(float targetFreq, float tolerance) {
   if (!noiseCalibrated) return 0;
   
@@ -211,9 +190,9 @@ float getFrequencyMagnitude(float targetFreq, float tolerance) {
   float maxMagnitude = 0;
   int peakBin = -1;
   
-  // Find peak magnitude in range
+  
   for (int i = minBin; i <= maxBin; i++) {
-    // Subtract noise floor with 2 sigma margin
+    
     float signal = vReal[i];
     float noise = noiseFloor[i] + 2.0 * noiseStdDev[i];
     float magnitude = max(0.0f, signal - noise);
@@ -224,7 +203,7 @@ float getFrequencyMagnitude(float targetFreq, float tolerance) {
     }
   }
   
-  // Parabolic interpolation for sub-bin accuracy
+  
   if (peakBin > 0 && peakBin < FFT_SIZE/2 - 1) {
     float alpha = vReal[peakBin - 1];
     float beta = vReal[peakBin];
@@ -245,7 +224,7 @@ float calculateSNR(float targetFreq) {
   bin = constrain(bin, 1, FFT_SIZE/2 - 1);
   
   float signal = vReal[bin];
-  float noise = noiseFloor[bin] + 0.001; // Avoid division by zero
+  float noise = noiseFloor[bin] + 0.001; 
   
   return signal / noise;
 }
@@ -255,7 +234,7 @@ float calculateSpectralFlatness() {
   float arithmeticMean = 0;
   int count = 0;
   
-  // Analyze mid-frequency range (100 Hz to 5000 Hz)
+  
   float freqResolution = (float)SAMPLE_RATE / FFT_SIZE;
   int startBin = (int)(100.0 / freqResolution);
   int endBin = (int)(5000.0 / freqResolution);
@@ -273,26 +252,23 @@ float calculateSpectralFlatness() {
   return geometricMean / arithmeticMean;
 }
 
-// ============================================================================
-// DRONE DETECTION ENGINE
-// ============================================================================
 bool detectDrone(char* detectedName, float* confidence, float* snr) {
   if (!noiseCalibrated) {
     *confidence = 0;
     return false;
   }
   
-  // Check spectral flatness (drones have peaks, not flat noise)
+  
   float flatness = calculateSpectralFlatness();
   if (flatness > 0.6) {
-    return false; // Too noisy, likely not a drone
+    return false; 
   }
   
   float maxScore = 0;
   int bestProfile = -1;
   float bestSNR = 0;
   
-  // Calculate overall RMS for normalization
+  
   float rms = 0;
   for (int i = 0; i < FFT_SIZE; i++) {
     rms += fftBuffer[i] * fftBuffer[i];
@@ -300,14 +276,14 @@ bool detectDrone(char* detectedName, float* confidence, float* snr) {
   rms = sqrt(rms / FFT_SIZE);
   
   if (rms < 50) {
-    return false; // Too quiet
+    return false; 
   }
   
-  // Check each drone profile
+  
   for (int p = 0; p < NUM_PROFILES; p++) {
     DroneProfile* profile = &profiles[p];
     
-    // 1. Check fundamental frequency
+    
     float fundamental_mag = getFrequencyMagnitude(
       profile->fundamental_freq, 
       profile->frequency_tolerance
@@ -315,12 +291,12 @@ bool detectDrone(char* detectedName, float* confidence, float* snr) {
     
     float fundamental_snr = calculateSNR(profile->fundamental_freq);
     
-    // Require minimum SNR for fundamental
+    
     if (fundamental_snr < MIN_SNR) {
       continue;
     }
     
-    // 2. Check harmonics
+    
     float harmonic_score = 0;
     int valid_harmonics = 0;
     
@@ -333,7 +309,7 @@ bool detectDrone(char* detectedName, float* confidence, float* snr) {
         
         float harm_snr = calculateSNR(profile->harmonics[h]);
         
-        if (harm_snr > 2.0) { // Lower threshold for harmonics
+        if (harm_snr > 2.0) { 
           harmonic_score += harm_snr;
           valid_harmonics++;
         }
@@ -342,25 +318,25 @@ bool detectDrone(char* detectedName, float* confidence, float* snr) {
       if (valid_harmonics > 0) {
         harmonic_score /= profile->num_harmonics;
       } else {
-        // If profile has harmonics but none detected, penalize
+        
         harmonic_score = 0;
       }
     } else {
-      // Profile has no harmonics, use only fundamental
+      
       harmonic_score = fundamental_snr * 0.5;
     }
     
-    // 3. Calculate weighted confidence score
+    
     float weight_fundamental = profile->num_harmonics > 0 ? 0.7 : 1.0;
     float weight_harmonics = profile->num_harmonics > 0 ? 0.3 : 0.0;
     
     float total_score = (fundamental_snr * weight_fundamental + 
                         harmonic_score * weight_harmonics) / 10.0;
     
-    // Normalize to 0-1 range
+    
     total_score = constrain(total_score, 0, 1);
     
-    // Check if this profile matches
+    
     if (total_score > profile->confidence_threshold && total_score > maxScore) {
       maxScore = total_score;
       bestProfile = p;
@@ -368,7 +344,7 @@ bool detectDrone(char* detectedName, float* confidence, float* snr) {
     }
   }
   
-  // Return best match if found
+  
   if (bestProfile >= 0) {
     strcpy(detectedName, profiles[bestProfile].name);
     *confidence = maxScore;
@@ -379,18 +355,15 @@ bool detectDrone(char* detectedName, float* confidence, float* snr) {
   return false;
 }
 
-// ============================================================================
-// TEMPORAL CONSISTENCY CHECK
-// ============================================================================
 bool checkTemporalConsistency(int currentProfile, float currentConfidence, float currentSNR) {
-  // Add current detection to history
+  
   history[historyIdx].profileIdx = currentProfile;
   history[historyIdx].confidence = currentConfidence;
   history[historyIdx].snr = currentSNR;
   history[historyIdx].timestamp = millis();
   historyIdx = (historyIdx + 1) % HISTORY_SIZE;
   
-  // Count votes for each profile in recent history (last 3 seconds)
+  
   int votes[NUM_PROFILES] = {0};
   float avgConfidence[NUM_PROFILES] = {0};
   int validCount[NUM_PROFILES] = {0};
@@ -407,18 +380,18 @@ bool checkTemporalConsistency(int currentProfile, float currentConfidence, float
     }
   }
   
-  // Calculate average confidence for profiles with votes
+  
   for (int i = 0; i < NUM_PROFILES; i++) {
     if (validCount[i] > 0) {
       avgConfidence[i] /= validCount[i];
     }
   }
   
-  // Check if current profile has enough consistent detections
+  
   if (votes[currentProfile] >= MIN_DETECTIONS && 
       avgConfidence[currentProfile] > profiles[currentProfile].confidence_threshold) {
     
-    // Check minimum duration requirement
+    
     if (currentProfile != lastDetectedProfile) {
       detectionStartTime = millis();
       lastDetectedProfile = currentProfile;
@@ -433,7 +406,7 @@ bool checkTemporalConsistency(int currentProfile, float currentConfidence, float
       }
     }
   } else {
-    // Reset if detection changed
+    
     if (currentProfile != lastDetectedProfile) {
       lastDetectedProfile = -1;
       consecutiveDetections = 0;
@@ -443,9 +416,6 @@ bool checkTemporalConsistency(int currentProfile, float currentConfidence, float
   return false;
 }
 
-// ============================================================================
-// SETUP
-// ============================================================================
 void setup() {
   Serial.begin(921600);
   while (!Serial && millis() < 3000) {
@@ -458,11 +428,11 @@ void setup() {
   Serial.println("║   Seeeduino XIAO RP2040 + INMP441 + ML      ║");
   Serial.println("╚═══════════════════════════════════════════════╝\n");
 
-  // Initialize LED
+  
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
 
-  // Initialize I2S
+  
   i2s.setBCLK(I2S_SCK);
   i2s.setDIN(I2S_SD);
   i2s.setBitsPerSample(BITS_PER_SAMPLE);
@@ -478,19 +448,19 @@ void setup() {
   }
   Serial.println("✓ I2S initialized (44.1kHz, 16-bit)");
 
-  // Initialize UART
+  
   Serial1.begin(9600);
   Serial.println("✓ UART initialized (9600 baud)");
 
-  // Initialize NeoPixel
+  
   pinMode(11, OUTPUT);
   digitalWrite(11, HIGH);
   pixels.begin();
-  pixels.setPixelColor(0, pixels.Color(32, 0, 32)); // Purple during calibration
+  pixels.setPixelColor(0, pixels.Color(32, 0, 32)); 
   pixels.show();
   Serial.println("✓ NeoPixel initialized");
 
-  // Print loaded profiles
+  
   Serial.println("\n📋 LOADED DRONE PROFILES:");
   for (int i = 0; i < NUM_PROFILES; i++) {
     Serial.print("  ");
@@ -511,28 +481,25 @@ void setup() {
     Serial.println();
   }
 
-  // Calibrate noise floor
+  
   delay(1000);
   calibrateNoiseFloor();
 
-  // Initialize timers
+  
   lastPingTime = millis();
   lastPongTime = millis();
   lastMaxReset = millis();
   
-  pixels.setPixelColor(0, pixels.Color(0, 64, 0)); // Green - ready
+  pixels.setPixelColor(0, pixels.Color(0, 64, 0)); 
   pixels.show();
   
   Serial.println("\n✓✓✓ System ready! Listening for drones... ✓✓✓\n");
 }
 
-// ============================================================================
-// MAIN LOOP
-// ============================================================================
 void loop() {
   unsigned long currentTime = millis();
 
-  // Handle serial commands
+  
   if (Serial.available()) {
     char cmd = Serial.read();
     if (cmd == 'r' || cmd == 'R') {
@@ -549,7 +516,7 @@ void loop() {
   }
 
   if (recording) {
-    // Read audio from I2S
+    
     int samplesAvailable = i2s.available();
 
     if (samplesAvailable > 0) {
@@ -561,28 +528,28 @@ void loop() {
         audioBuffer[i] = left;
       }
 
-      // Accumulate samples for FFT with overlap
+      
       for (int i = 0; i < samplesToRead; i++) {
         if (fftBufferIdx < FFT_SIZE) {
           fftBuffer[fftBufferIdx++] = (float)audioBuffer[i];
         }
         
-        // Process when buffer full or at overlap point
+        
         if (fftBufferIdx >= FFT_SIZE) {
-          // Copy to FFT working arrays and apply Hamming window
+          
           for (int j = 0; j < FFT_SIZE; j++) {
             float window = 0.54 - 0.46 * cos(2.0 * PI * j / (FFT_SIZE - 1));
             vReal[j] = fftBuffer[j] * window;
             vImag[j] = 0;
           }
           
-          // Compute FFT
+          
           unsigned long fftStart = micros();
           FFT.compute(vReal, vImag, FFT_SIZE, FFTDirection::Forward);
           FFT.complexToMagnitude(vReal, vImag, FFT_SIZE);
           unsigned long fftTime = micros() - fftStart;
           
-          // Detect drone
+          
           char detectedName[32] = "";
           float confidence = 0;
           float snr = 0;
@@ -592,7 +559,7 @@ void loop() {
           unsigned long detectTime = micros() - detectStart;
           
           if (droneDetected) {
-            // Get profile index
+            
             int profileIdx = -1;
             for (int p = 0; p < NUM_PROFILES; p++) {
               if (strcmp(detectedName, profiles[p].name) == 0) {
@@ -601,9 +568,9 @@ void loop() {
               }
             }
             
-            // Check temporal consistency
+            
             if (profileIdx >= 0 && checkTemporalConsistency(profileIdx, confidence, snr)) {
-              // Confirmed detection - send UART message
+              
               if (currentTime - lastDroneSent > 1000) {
                 Serial1.println("drone");
                 lastDroneSent = currentTime;
@@ -622,7 +589,7 @@ void loop() {
             }
           }
           
-          // Debug output every 5 seconds
+          
           static unsigned long lastDebug = 0;
           if (millis() - lastDebug > 5000) {
             Serial.print("📊 FFT: ");
@@ -634,20 +601,20 @@ void loop() {
             lastDebug = millis();
           }
           
-          // Shift buffer for overlap (50%)
+          
           memmove(fftBuffer, fftBuffer + FFT_OVERLAP, 
                   FFT_OVERLAP * sizeof(float));
           fftBufferIdx = FFT_OVERLAP;
         }
       }
 
-      // Status LED heartbeat
+      
       if (millis() - lastStatusUpdate > 1000) {
         digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
         lastStatusUpdate = millis();
       }
 
-      // Volume level detection for "loud" signal
+      
       long sum = 0;
       for (int i = 0; i < samplesToRead; i++) {
         long sample = audioBuffer[i];
@@ -656,7 +623,7 @@ void loop() {
       float rms = sqrt(sum / samplesToRead);
       int volumeLevel = (int)rms;
 
-      // Track max volume over 15 seconds
+      
       if (currentTime - lastMaxReset > 15000) {
         maxVolume = 0;
         lastMaxReset = currentTime;
@@ -665,7 +632,7 @@ void loop() {
         maxVolume = volumeLevel;
       }
 
-      // Send loud signal if above threshold
+      
       if (volumeLevel > 0.75 * maxVolume && maxVolume > 100) {
         Serial1.println("loud");
         lastLoudTime = currentTime;
@@ -673,13 +640,13 @@ void loop() {
     }
   }
 
-  // UART heartbeat
+  
   if (currentTime - lastPingTime > PING_INTERVAL_MS) {
     Serial1.println("ping");
     lastPingTime = currentTime;
   }
 
-  // Read UART responses
+  
   while (Serial1.available()) {
     String msg = Serial1.readStringUntil('\n');
     msg.trim();
@@ -697,18 +664,18 @@ void loop() {
     }
   }
 
-  // Update NeoPixel (priority: drone > loud > connected > disconnected)
+  
   if (currentTime - lastDroneTime < DRONE_ALERT_DURATION) {
-    // Drone detected: YELLOW
+    
     pixels.setPixelColor(0, pixels.Color(255, 255, 0));
   } else if (currentTime - lastLoudTime < LOUD_DURATION) {
-    // Loud sound: BLUE
+    
     pixels.setPixelColor(0, pixels.Color(0, 0, 127));
   } else if (currentTime - lastPongTime < CONNECTION_TIMEOUT) {
-    // Connected: GREEN
+    
     pixels.setPixelColor(0, pixels.Color(0, 64, 0));
   } else {
-    // Disconnected: RED
+    
     pixels.setPixelColor(0, pixels.Color(64, 0, 0));
   }
   pixels.show();

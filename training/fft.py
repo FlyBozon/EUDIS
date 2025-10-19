@@ -10,11 +10,10 @@ def plot_fft(data, samplerate, filename, output_dir, max_freq=1000):
     n = len(data)
     fft_vals = np.fft.fft(data)
     fft_freqs = np.fft.fftfreq(n, 1 / samplerate)
-    
+
     positive_freqs = fft_freqs[:n // 2]
     magnitude = np.abs(fft_vals[:n // 2])
-    
-    # ograniczamy do 1000 Hz
+
     mask = positive_freqs <= max_freq
     plt.figure(figsize=(10, 5))
     plt.plot(positive_freqs[mask], magnitude[mask])
@@ -23,7 +22,7 @@ def plot_fft(data, samplerate, filename, output_dir, max_freq=1000):
     plt.ylabel("Amplituda")
     plt.grid(True)
     plt.tight_layout()
-    
+
     fft_path = os.path.join(output_dir, f"{filename}_fft.png")
     plt.savefig(fft_path, dpi=300)
     plt.close()
@@ -36,10 +35,10 @@ def plot_spectrogram(data, samplerate, filename, output_dir, max_freq=1000):
     plt.title(f"Spektrogram — {filename}")
     plt.xlabel("Czas [s]")
     plt.ylabel("Częstotliwość [Hz]")
-    plt.ylim(0, max_freq)  # Ograniczenie do 1000 Hz
+    plt.ylim(0, max_freq)
     plt.colorbar(label='Intensywność [dB]')
     plt.tight_layout()
-    
+
     spec_path = os.path.join(output_dir, f"{filename}_spectrogram.png")
     plt.savefig(spec_path, dpi=300)
     plt.close()
@@ -53,7 +52,7 @@ def plot_mfcc(y, sr, filename, output_dir):
     plt.colorbar(label="Wartość współczynnika MFCC")
     plt.title(f"MFCC — {filename}")
     plt.tight_layout()
-    
+
     mfcc_path = os.path.join(output_dir, f"{filename}_mfcc.png")
     plt.savefig(mfcc_path, dpi=300)
     plt.close()
@@ -62,20 +61,18 @@ def plot_mfcc(y, sr, filename, output_dir):
 
 def process_wav(filepath, output_dir):
     filename = os.path.splitext(os.path.basename(filepath))[0]
-    
+
     try:
         samplerate, data = wavfile.read(filepath)
-        if len(data.shape) > 1:  # stereo -> mono
+        if len(data.shape) > 1:
             data = data[:, 0]
-        
-        # FFT i spektrogram z surowych danych (ograniczone do 1000 Hz)
+
         plot_fft(data, samplerate, filename, output_dir, max_freq=1000)
         plot_spectrogram(data, samplerate, filename, output_dir, max_freq=1000)
-        
-        # MFCC z librosa
+
         y, sr = librosa.load(filepath, sr=None, mono=True)
         plot_mfcc(y, sr, filename, output_dir)
-        
+
     except Exception as e:
         print(f"Błąd przy {filepath}: {e}")
 
@@ -84,11 +81,11 @@ def main():
     if len(sys.argv) < 2:
         print("Użycie: python audio_analysis.py <ścieżka_do_pliku_lub_folderu>")
         sys.exit(1)
-    
+
     input_path = sys.argv[1]
     output_dir = "output"
     os.makedirs(output_dir, exist_ok=True)
-    
+
     if os.path.isdir(input_path):
         wav_files = [os.path.join(input_path, f) for f in os.listdir(input_path) if f.lower().endswith(".wav")]
         if not wav_files:

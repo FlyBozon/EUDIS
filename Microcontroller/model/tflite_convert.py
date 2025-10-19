@@ -6,18 +6,15 @@ def representative_dataset():
     for _ in range(10):
         yield [np.random.randn(1, 1, 224, 224).astype(np.float32)]
 
-# Create a simple TFLite model from scratch
 class SimpleModel(tf.Module):
     def __init__(self):
         super().__init__()
         self.dense1 = tf.keras.layers.Dense(512)
         self.dense2 = tf.keras.layers.Dense(2)
-    
+
     @tf.function(input_signature=[tf.TensorSpec(shape=[1, 1, 224, 224], dtype=tf.float32)])
     def __call__(self, x):
-        # Flatten
         x = tf.reshape(x, [1, -1])
-        # Dummy processing
         x = self.dense1(x)
         x = tf.nn.relu(x)
         x = self.dense2(x)

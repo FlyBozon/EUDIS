@@ -16,14 +16,12 @@
 #define BALL_DROP_INTERVAL 100.0
 #define MAX_BALLS 15
 
-// Second drone
 #define DRONE2_START_Y -200.0
 #define DRONE2_END_Y 200.0
-#define DRONE2_X 500.0  // Middle of path
+#define DRONE2_X 500.0  
 #define DRONE2_ALTITUDE 7.5
 #define DRONE2_SPEED 6.25
 
-// Sensor parameters
 #define SENSOR_RANGE 200.0
 #define MAX_SENSORS 15
 
@@ -96,12 +94,12 @@ int main(int argc, char **argv) {
 
     int current_view = 0;
 
-    // CaseDeploy/Sensor spawning variables
+    
     int ball_count = 0;
     double next_drop_distance = BALL_DROP_INTERVAL;
     WbNodeRef last_ball = NULL;
 
-    // Sensor tracking
+    
     Sensor sensors[MAX_SENSORS];
     for (int i = 0; i < MAX_SENSORS; i++) {
         sensors[i].node = NULL;
@@ -221,7 +219,7 @@ int main(int argc, char **argv) {
 
             last_ball = wb_supervisor_node_get_from_def(case_def);
 
-            // Track as sensor
+            
             sensors[ball_count].node = last_ball;
             sensors[ball_count].position[0] = x;
             sensors[ball_count].position[1] = y;
@@ -234,7 +232,7 @@ int main(int argc, char **argv) {
             next_drop_distance += BALL_DROP_INTERVAL;
         }
 
-        // Check if drone1 finished
+        
         if (x >= END_X && !drone1_finished) {
             drone1_finished = true;
             drone2_start_time = wb_robot_get_time();
@@ -242,14 +240,14 @@ int main(int argc, char **argv) {
             printf("Deployed %d sensors with 200m detection range\n\n", ball_count);
         }
 
-        // Control second drone
+        
         if (drone1_finished && drone2 && !drone2_finished) {
             double drone2_elapsed = wb_robot_get_time() - drone2_start_time;
             double drone2_distance = DRONE2_SPEED * drone2_elapsed;
             double drone2_y = DRONE2_START_Y + drone2_distance;
 
             if (drone2_y <= DRONE2_END_Y) {
-                // Add sensor noise
+                
                 double y_noise = multiOctaveNoise(drone2_elapsed, 0.4, 0.2, 2);
                 double z_noise = multiOctaveNoise(drone2_elapsed + 300.0, 0.6, 0.15, 2);
 
@@ -278,7 +276,7 @@ int main(int argc, char **argv) {
                     }
                 }
 
-                // Check sensor detections
+                
                 int detecting_sensors[2] = {-1, -1};
                 int detection_count = 0;
 
@@ -295,7 +293,7 @@ int main(int argc, char **argv) {
                     }
                 }
 
-                // Visualize detection zone (2 sensors)
+                
                 if (detection_count == 2) {
                     double estimated_pos[3];
                     double zone_radius;
@@ -449,7 +447,7 @@ int main(int argc, char **argv) {
             dy_ball /= dist_ball;
             dz_ball /= dist_ball;
 
-            // Calculate yaw )
+            
             double yaw_angle = atan2(dy_ball, dx_ball);
             double pitch_angle = atan2(-dz_ball, sqrt(dx_ball*dx_ball + dy_ball*dy_ball));
             pitch_angle -= 1.0 * M_PI / 180.0;
