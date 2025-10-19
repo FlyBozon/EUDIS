@@ -2,8 +2,8 @@ export interface Detection {
   id: string;
   lineId: string;
   timestamp: number;
-  intensity: number; // 0-100
-  frequency: number; // dB
+  intensity: number; 
+  frequency: number; 
 }
 
 export interface EspNode {
@@ -20,13 +20,13 @@ export interface DeploymentLine {
   startLng: number;
   endLat: number;
   endLng: number;
-  spacing: 100 | 200 | 300; // meters
+  spacing: 100 | 200 | 300; 
   createdAt: number;
-  costMin?: number; // PLN
-  costMax?: number; // PLN
-  weightMin?: number; // kg
-  weightMax?: number; // kg
-  distanceKm?: number; // km
+  costMin?: number; 
+  costMax?: number; 
+  weightMin?: number; 
+  weightMax?: number; 
+  distanceKm?: number; 
 }
 
 export interface DroneRoute {

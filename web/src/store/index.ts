@@ -1,36 +1,41 @@
 import { create } from 'zustand';
 import { Detection, EspNode, DeploymentLine, Theme } from '@/types/index';
+import type { Language } from '@/i18n/translations';
 
 interface AppStore {
-  // Theme management
+  
   theme: Theme;
   setTheme: (theme: Theme) => void;
 
-  // Deployment data
+  
+  language: Language;
+  setLanguage: (language: Language) => void;
+
+  
   deploymentLines: DeploymentLine[];
   addDeploymentLine: (line: DeploymentLine) => void;
   clearDeploymentLines: () => void;
 
-  // ESP nodes
+  
   espNodes: EspNode[];
   addEspNode: (node: EspNode) => void;
   addEspNodes: (nodes: EspNode[]) => void;
   clearEspNodes: () => void;
 
-  // Detections
+  
   detections: Detection[];
   addDetection: (detection: Detection) => void;
   clearDetections: () => void;
 
-  // Drone simulation
+  
   dronePositions: Array<[number, number]>;
   setDronePositions: (positions: Array<[number, number]>) => void;
 
-  // UI states
+  
   selectedLineId: string | null;
   setSelectedLineId: (id: string | null) => void;
 
-  // Mission planning
+  
   missionStartPoint: [number, number] | null;
   missionEndPoint: [number, number] | null;
   setMissionStartPoint: (point: [number, number] | null) => void;
@@ -39,11 +44,15 @@ interface AppStore {
 }
 
 export const useAppStore = create<AppStore>((set) => ({
-  // Theme
+  
   theme: 'auto',
   setTheme: (theme) => set({ theme }),
 
-  // Deployment lines
+  
+  language: 'pl',
+  setLanguage: (language) => set({ language }),
+
+  
   deploymentLines: [],
   addDeploymentLine: (line) =>
     set((state) => ({
@@ -51,7 +60,7 @@ export const useAppStore = create<AppStore>((set) => ({
     })),
   clearDeploymentLines: () => set({ deploymentLines: [] }),
 
-  // ESP nodes
+  
   espNodes: [],
   addEspNode: (node) =>
     set((state) => ({
@@ -63,7 +72,7 @@ export const useAppStore = create<AppStore>((set) => ({
     })),
   clearEspNodes: () => set({ espNodes: [] }),
 
-  // Detections
+  
   detections: [],
   addDetection: (detection) =>
     set((state) => ({
@@ -71,15 +80,15 @@ export const useAppStore = create<AppStore>((set) => ({
     })),
   clearDetections: () => set({ detections: [] }),
 
-  // Drone simulation
+  
   dronePositions: [],
   setDronePositions: (positions) => set({ dronePositions: positions }),
 
-  // UI
+  
   selectedLineId: null,
   setSelectedLineId: (id) => set({ selectedLineId: id }),
 
-  // Mission planning
+  
   missionStartPoint: null,
   missionEndPoint: null,
   setMissionStartPoint: (point) => set({ missionStartPoint: point }),

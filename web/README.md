@@ -14,7 +14,7 @@ System monitorowania dronów z wykorzystaniem sieci sensorów audio (ESP32/ESP82
 ### 🚁 Planowanie misji
 - Wysyłanie drona w wybrane miejsce
 - Definiowanie linii zrzutu sensorów
-- Konfiguracja rozstawu ESP (300m, 500m, 1000m)
+- Konfiguracja rozstawu ESP (100m, 200m, 300m)
 - **💰 Kalkulator kosztów** - szacunkowy koszt całkowity wdrożenia (PLN)
 - **⚖️ Kalkulator wagi** - szacunkowa waga infrastruktury (kg)
 
@@ -85,9 +85,9 @@ Kalkulator automatycznie oblicza koszty i wagę na podstawie:
 
 | Rozstaw | Koszt (PLN/km) | Waga (kg/km) |
 |---------|---|---|
-| **ESP co 300m** | 530-600 | 3.0–4.5 |
-| **ESP co 500m** | 480-550 | 2.6–4.0 |
-| **ESP co 1000m** | 430-500 | 2.2–3.7 |
+| **ESP co 100m** | 800-950 | 4.5–5.5 |
+| **ESP co 200m** | 600-750 | 3.5–4.5 |
+| **ESP co 300m** | 530-600 | 3.0–4.0 |
 
 Wartości są multipliko wane przez dystans trasy do uzyskania całkowitego szacunku.
 
@@ -96,7 +96,7 @@ Wartości są multipliko wane przez dystans trasy do uzyskania całkowitego szac
 - [x] Mapa interaktywna z Leaflet
 - [x] Planowanie misji (wybór punktu startu i końca)
 - [x] Wizualizacja linii wdrożeń i węzłów ESP
-- [x] Konfiguracja rozstawu sensorów (300m, 500m, 1000m)
+- [x] Konfiguracja rozstawu sensorów (100m, 200m, 300m)
 - [x] **Wyszukiwarka lokalizacji** - OpenStreetMap Nominatim API
 - [x] **Kalkulator kosztów i wagi** - szacunki dla różnych rostawów
 - [x] Motywy jasny/ciemny

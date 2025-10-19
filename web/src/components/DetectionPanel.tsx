@@ -1,22 +1,24 @@
 import { useAppStore } from '@/store/index';
+import { useTranslation } from '@/i18n/useTranslation';
 
 export const DetectionPanel = () => {
   const detections = useAppStore((state) => state.detections);
   const espNodes = useAppStore((state) => state.espNodes);
+  const t = useTranslation();
 
-  const recentDetections = detections.slice(-50).reverse(); // Zwiększ limit aby scroll miał sens
+  const recentDetections = detections.slice(-50).reverse(); 
 
   return (
     <div className="bg-card border border-border rounded-lg p-4 flex flex-col" style={{ height: '465px' }}>
       <div className="flex items-center gap-2 mb-4 flex-shrink-0">
-        <h2 className="font-semibold">Wykrycia</h2>
+        <h2 className="font-semibold">{t.detectionPanel.title}</h2>
         <span className="ml-auto text-sm text-muted-foreground">{detections.length}</span>
       </div>
 
       <div className="overflow-y-auto space-y-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent pr-1" style={{ height: '433px', scrollbarGutter: 'stable' }}>
         {recentDetections.length === 0 ? (
           <div className="flex items-center justify-center h-full text-muted-foreground">
-            <p className="text-sm">Brak wykryć</p>
+            <p className="text-sm">{t.detectionPanel.noDetections}</p>
           </div>
         ) : (
           recentDetections.map((detection) => {
@@ -35,7 +37,7 @@ export const DetectionPanel = () => {
                   </span>
                 </div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  Pewność: {Math.round(detection.intensity)}% | Poziom sygnału: {Math.round(detection.frequency)} dB
+                  {t.detectionPanel.intensity}: {Math.round(detection.intensity)}% | {t.detectionPanel.frequency}: {Math.round(detection.frequency)} dB
                 </div>
               </div>
             );
