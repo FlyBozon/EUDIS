@@ -22,9 +22,9 @@ export const DeploymentDialog = () => {
 
   // Dane kosztów i wagi na podstawie rozstawu
   const costAndWeightData: Record<300 | 500 | 1000, { costMin: number; costMax: number; weightMin: number; weightMax: number }> = {
-    300: { costMin: 3470, costMax: 7867, weightMin: 3.0, weightMax: 4.5 },
-    500: { costMin: 3080, costMax: 7320, weightMin: 2.6, weightMax: 4.0 },
-    1000: { costMin: 2790, costMax: 6910, weightMin: 2.2, weightMax: 3.7 },
+    300: { costMin: 530, costMax: 600, weightMin: 3.0, weightMax: 4.5 },
+    500: { costMin: 480, costMax: 550, weightMin: 2.6, weightMax: 4.0 },
+    1000: { costMin: 430, costMax: 500, weightMin: 2.2, weightMax: 3.7 },
   };
 
   // Funkcja pomocnicza do obliczenia dystansu w km

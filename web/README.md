@@ -85,9 +85,9 @@ Kalkulator automatycznie oblicza koszty i wagę na podstawie:
 
 | Rozstaw | Koszt (PLN/km) | Waga (kg/km) |
 |---------|---|---|
-| **ESP co 300m** | 3 470–7 867 | 3.0–4.5 |
-| **ESP co 500m** | 3 080–7 320 | 2.6–4.0 |
-| **ESP co 1000m** | 2 790–6 910 | 2.2–3.7 |
+| **ESP co 300m** | 530-600 | 3.0–4.5 |
+| **ESP co 500m** | 480-550 | 2.6–4.0 |
+| **ESP co 1000m** | 430-500 | 2.2–3.7 |
 
 Wartości są multipliko wane przez dystans trasy do uzyskania całkowitego szacunku.
 
