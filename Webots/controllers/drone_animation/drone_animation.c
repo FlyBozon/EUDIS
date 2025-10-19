@@ -1,17 +1,31 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include <webots/robot.h>
 #include <webots/supervisor.h>
 #include <webots/motor.h>
 #include <webots/keyboard.h>
 
+#include "sensor_detection.h"
+
 #define START_X -5.0
 #define END_X 1000.0
 #define BASE_ALTITUDE 7.5
-#define DRONE_SPEED 6.25
+#define DRONE_SPEED 10.25
 #define BALL_DROP_INTERVAL 100.0
 #define MAX_BALLS 15
+
+// Second drone
+#define DRONE2_START_Y -200.0
+#define DRONE2_END_Y 200.0
+#define DRONE2_X 500.0  // Middle of path
+#define DRONE2_ALTITUDE 7.5
+#define DRONE2_SPEED 6.25
+
+// Sensor parameters
+#define SENSOR_RANGE 200.0
+#define MAX_SENSORS 15
 
 double multiOctaveNoise(double x, double base_freq, double base_amp, int octaves) {
     double total = 0.0;
@@ -82,13 +96,38 @@ int main(int argc, char **argv) {
 
     int current_view = 0;
 
-    // Ball spawning variables
+    // CaseDeploy/Sensor spawning variables
     int ball_count = 0;
     double next_drop_distance = BALL_DROP_INTERVAL;
     WbNodeRef last_ball = NULL;
 
+    // Sensor tracking
+    Sensor sensors[MAX_SENSORS];
+    for (int i = 0; i < MAX_SENSORS; i++) {
+        sensors[i].node = NULL;
+        sensors[i].active = false;
+        sensors[i].signal_strength = 0.0;
+    }
+
+    WbNodeRef drone2 = wb_supervisor_node_get_from_def("DRONE2");
+    WbFieldRef drone2_trans_field = NULL;
+    WbFieldRef drone2_rotation_field = NULL;
+
+    if (drone2) {
+        drone2_trans_field = wb_supervisor_node_get_field(drone2, "translation");
+        drone2_rotation_field = wb_supervisor_node_get_field(drone2, "rotation");
+
+        const double drone2_initial_pos[3] = {DRONE2_X, DRONE2_START_Y, DRONE2_ALTITUDE};
+        wb_supervisor_field_set_sf_vec3f(drone2_trans_field, drone2_initial_pos);
+    }
+
+    bool drone1_finished = false;
+    double drone2_start_time = 0.0;
+    WbNodeRef detection_zone = NULL;
+    bool drone2_finished = false;
+
     printf("Camera Controls:\n");
-    printf("  1 - Free camera\n  2 - Drone FPV\n  3 - Follow\n  4 - Front\n  5 - Ball Follow\n\n");
+    printf("  1 - Free camera\n  2 - Drone FPV\n  3 - Follow\n  4 - Front\n  5 - Case Follow\n\n");
     printf("Starting flight...\n");
 
     double start_time = wb_robot_get_time();
@@ -163,46 +202,152 @@ int main(int argc, char **argv) {
         };
         wb_supervisor_field_set_sf_rotation(rotation_field, new_rotation);
 
-        // Ball spawning logic - drop a ball every 100m
         if (distance_traveled >= next_drop_distance && ball_count < MAX_BALLS) {
-            char ball_def[64];
-            snprintf(ball_def, sizeof(ball_def), "BALL_%d", ball_count + 1);
+            char case_def[64];
+            snprintf(case_def, sizeof(case_def), "CASE_%d", ball_count + 1);
 
-            char ball_string[512];
-            snprintf(ball_string, sizeof(ball_string),
-                "DEF %s Solid {\n"
+            char case_string[256];
+            snprintf(case_string, sizeof(case_string),
+                "DEF %s CaseDeploy {\n"
                 "  translation %.2f %.2f %.2f\n"
-                "  children [\n"
-                "    Shape {\n"
-                "      appearance PBRAppearance {\n"
-                "        baseColor 1 0 0\n"
-                "        metalness 0\n"
-                "        roughness 0.5\n"
-                "      }\n"
-                "      geometry Sphere {\n"
-                "        radius 0.3\n"
-                "      }\n"
-                "    }\n"
-                "  ]\n"
-                "  boundingObject Sphere {\n"
-                "    radius 0.3\n"
-                "  }\n"
-                "  physics Physics {\n"
-                "    density 500\n"
-                "    bounce 0.5\n"
-                "  }\n"
+                "  mass 2.0\n"
+                "  hitboxRadius 0.3\n"
                 "}\n",
-                ball_def, x, y, z);
+                case_def, x, y, z);
 
             WbNodeRef root = wb_supervisor_node_get_root();
             WbFieldRef children = wb_supervisor_node_get_field(root, "children");
-            wb_supervisor_field_import_mf_node_from_string(children, -1, ball_string);
+            wb_supervisor_field_import_mf_node_from_string(children, -1, case_string);
 
-            last_ball = wb_supervisor_node_get_from_def(ball_def);
+            last_ball = wb_supervisor_node_get_from_def(case_def);
+
+            // Track as sensor
+            sensors[ball_count].node = last_ball;
+            sensors[ball_count].position[0] = x;
+            sensors[ball_count].position[1] = y;
+            sensors[ball_count].position[2] = 0.0;
+            sensors[ball_count].active = true;
+
             ball_count++;
 
-            printf("Ball dropped at X=%.1f! (Ball %d/%d)\n", x, ball_count, MAX_BALLS);
+            printf("CaseDeploy/Sensor dropped at X=%.1f! (Sensor %d/%d)\n", x, ball_count, MAX_BALLS);
             next_drop_distance += BALL_DROP_INTERVAL;
+        }
+
+        // Check if drone1 finished
+        if (x >= END_X && !drone1_finished) {
+            drone1_finished = true;
+            drone2_start_time = wb_robot_get_time();
+            printf("\n=== Drone 1 completed! Starting Drone 2 ===\n");
+            printf("Deployed %d sensors with 200m detection range\n\n", ball_count);
+        }
+
+        // Control second drone
+        if (drone1_finished && drone2 && !drone2_finished) {
+            double drone2_elapsed = wb_robot_get_time() - drone2_start_time;
+            double drone2_distance = DRONE2_SPEED * drone2_elapsed;
+            double drone2_y = DRONE2_START_Y + drone2_distance;
+
+            if (drone2_y <= DRONE2_END_Y) {
+                // Add sensor noise
+                double y_noise = multiOctaveNoise(drone2_elapsed, 0.4, 0.2, 2);
+                double z_noise = multiOctaveNoise(drone2_elapsed + 300.0, 0.6, 0.15, 2);
+
+                double drone2_x = DRONE2_X;
+                double drone2_z = DRONE2_ALTITUDE + z_noise;
+
+                const double drone2_pos[3] = {drone2_x, drone2_y + y_noise, drone2_z};
+                wb_supervisor_field_set_sf_vec3f(drone2_trans_field, drone2_pos);
+
+                double roll2 = -y_noise * 0.15;
+                const double drone2_rotation[4] = {
+                    roll2 * 0.3,
+                    1.0 - fabs(roll2) * 0.2,
+                    0.1,
+                    1.5708
+                };
+                wb_supervisor_field_set_sf_rotation(drone2_rotation_field, drone2_rotation);
+
+                for (int i = 0; i < ball_count; i++) {
+                    if (sensors[i].node) {
+                        WbFieldRef sensor_trans = wb_supervisor_node_get_field(sensors[i].node, "translation");
+                        const double *actual_pos = wb_supervisor_field_get_sf_vec3f(sensor_trans);
+                        sensors[i].position[0] = actual_pos[0];
+                        sensors[i].position[1] = actual_pos[1];
+                        sensors[i].position[2] = actual_pos[2];
+                    }
+                }
+
+                // Check sensor detections
+                int detecting_sensors[2] = {-1, -1};
+                int detection_count = 0;
+
+                for (int i = 0; i < ball_count && detection_count < 2; i++) {
+                    if (sensors[i].active) {
+                        double dist = distance_3d(sensors[i].position, drone2_pos);
+                        if (dist <= SENSOR_RANGE) {
+                            sensors[i].signal_strength = calculate_signal_strength(dist);
+                            detecting_sensors[detection_count] = i;
+                            detection_count++;
+                        } else {
+                            sensors[i].signal_strength = 0.0;
+                        }
+                    }
+                }
+
+                // Visualize detection zone (2 sensors)
+                if (detection_count == 2) {
+                    double estimated_pos[3];
+                    double zone_radius;
+                    estimate_detection_zone(&sensors[detecting_sensors[0]],
+                                          &sensors[detecting_sensors[1]],
+                                          estimated_pos, &zone_radius);
+
+                    if (detection_zone == NULL) {
+                        char zone_string[1024];
+                        snprintf(zone_string, sizeof(zone_string),
+                            "DEF DETECT_ZONE Transform {\n"
+                            "  translation %.2f %.2f %.2f\n"
+                            "  children [\n"
+                            "    DEF ZONE_SHAPE Shape {\n"
+                            "      appearance PBRAppearance {\n"
+                            "        baseColor 1 1 0\n"
+                            "        transparency 0.7\n"
+                            "        metalness 0\n"
+                            "      }\n"
+                            "      geometry DEF ZONE_SPHERE Sphere {\n"
+                            "        radius %.2f\n"
+                            "      }\n"
+                            "    }\n"
+                            "  ]\n"
+                            "}\n",
+                            estimated_pos[0], estimated_pos[1], estimated_pos[2], zone_radius);
+
+                        WbNodeRef root = wb_supervisor_node_get_root();
+                        WbFieldRef children = wb_supervisor_node_get_field(root, "children");
+                        wb_supervisor_field_import_mf_node_from_string(children, -1, zone_string);
+                        detection_zone = wb_supervisor_node_get_from_def("DETECT_ZONE");
+                    } else {
+                        WbFieldRef zone_trans = wb_supervisor_node_get_field(detection_zone, "translation");
+                        wb_supervisor_field_set_sf_vec3f(zone_trans, estimated_pos);
+
+                        WbNodeRef zone_sphere = wb_supervisor_node_get_from_def("ZONE_SPHERE");
+                        if (zone_sphere) {
+                            WbFieldRef radius_field = wb_supervisor_node_get_field(zone_sphere, "radius");
+                            wb_supervisor_field_set_sf_float(radius_field, zone_radius);
+                        }
+                    }
+
+                    printf("DETECTION: Sensors %d,%d | Drone2: (%.1f,%.1f) | Zone: (%.1f,%.1f) r=%.1fm\n",
+                           detecting_sensors[0]+1, detecting_sensors[1]+1,
+                           drone2_pos[0], drone2_pos[1],
+                           estimated_pos[0], estimated_pos[1], zone_radius);
+                }
+            } else {
+                drone2_finished = true;
+                printf("\n=== Drone 2 completed perpendicular flight! ===\n");
+                printf("Final Drone 2 position: (%.2f, %.2f, %.2f)\n", DRONE2_X, drone2_y, DRONE2_ALTITUDE);
+            }
         }
 
         if (current_view == 0) {
@@ -245,7 +390,7 @@ int main(int argc, char **argv) {
             double pitch_shake = multiOctaveNoise(elapsed + 350.0, 3.2, 0.01, 2);
 
             const double follow_orient[4] = {
-                0.0, 1.0, 0.0, pitch_angle + 0.4 + pitch_shake
+                0.0, 1.0, 0.0, pitch_angle + 0 + pitch_shake
             };
             wb_supervisor_field_set_sf_rotation(main_rot, follow_orient);
 
@@ -277,26 +422,21 @@ int main(int argc, char **argv) {
             double pitch_shake = multiOctaveNoise(elapsed + 800.0, 3.3, 0.01, 2);
 
             const double front_orient[4] = {
-                0.0, 0.0, 1.0, M_PI - (pitch_angle + 0.4 + pitch_shake) + M_PI/6.0
+                -0.13, 0.0, 1.0, M_PI - (pitch_angle + 0.4 + pitch_shake) + M_PI/6.0
             };
             wb_supervisor_field_set_sf_rotation(main_rot, front_orient);
 
         } else if (current_view == 4 && vp_main && last_ball) {
-            // Ball follow camera - follows the last dropped ball
             WbFieldRef ball_trans_field = wb_supervisor_node_get_field(last_ball, "translation");
             const double *ball_pos = wb_supervisor_field_get_sf_vec3f(ball_trans_field);
 
             WbFieldRef main_trans = wb_supervisor_node_get_field(vp_main, "position");
             WbFieldRef main_rot = wb_supervisor_node_get_field(vp_main, "orientation");
 
-            double cam_shake_x = multiOctaveNoise(elapsed + 900.0, 2.4, 0.03, 2);
-            double cam_shake_y = multiOctaveNoise(elapsed + 1000.0, 2.7, 0.03, 2);
-            double cam_shake_z = multiOctaveNoise(elapsed + 1100.0, 2.9, 0.02, 2);
-
             const double ball_cam_pos[3] = {
-                ball_pos[0] - 3.0 + cam_shake_x,
-                ball_pos[1] - 2.5 + cam_shake_y,
-                ball_pos[2] + 1.5 + cam_shake_z
+                ball_pos[0] - 0.3,
+                ball_pos[1] - 0.25,
+                ball_pos[2] + 0.05
             };
             wb_supervisor_field_set_sf_vec3f(main_trans, ball_cam_pos);
 
@@ -309,10 +449,16 @@ int main(int argc, char **argv) {
             dy_ball /= dist_ball;
             dz_ball /= dist_ball;
 
+            // Calculate yaw )
             double yaw_angle = atan2(dy_ball, dx_ball);
+            double pitch_angle = atan2(-dz_ball, sqrt(dx_ball*dx_ball + dy_ball*dy_ball));
+            pitch_angle -= 1.0 * M_PI / 180.0;
 
             const double ball_orient[4] = {
-                0.0, 0.0, 1.0, yaw_angle
+                -sin(pitch_angle) * sin(yaw_angle),
+                sin(pitch_angle) * cos(yaw_angle),
+                cos(pitch_angle),
+                yaw_angle
             };
             wb_supervisor_field_set_sf_rotation(main_rot, ball_orient);
         }
@@ -324,8 +470,8 @@ int main(int argc, char **argv) {
             last_print = elapsed;
         }
 
-        if (x >= END_X) {
-            printf("\nFlight complete! Final position: (%.2f, %.2f, %.2f)\n", x, y, z);
+        if (drone2_finished) {
+            printf("\n=== Both drones completed! Simulation finished ===\n");
             break;
         }
     }

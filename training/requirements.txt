@@ -4,3 +4,5 @@ matplotlib
 scipy
 librosa
 torch
+opencv-python
+tqdm

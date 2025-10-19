@@ -38,6 +38,15 @@ export const DeploymentDialog = () => {
   };
 
   const distanceKm = calculateDistance();
+  
+  // Oblicz dokładną liczbę sensorów na podstawie dystansu i rozstawu
+  const calculateSensorCount = (): number => {
+    if (!missionStartPoint || !missionEndPoint) return 0;
+    const distanceInMeters = distanceKm * 1000;
+    return Math.floor(distanceInMeters / spacing) + 1; // +1 bo liczymy z punktem końcowym
+  };
+  
+  const sensorCount = calculateSensorCount();
 
   const handleDeploy = () => {
     if (!missionStartPoint || !missionEndPoint) {
@@ -191,18 +200,22 @@ export const DeploymentDialog = () => {
                 </button>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground">
-              {spacing === 300 && 'Sensorów: ~20-30'}
-              {spacing === 500 && 'Sensorów: ~10-20'}
-              {spacing === 1000 && 'Sensorów: ~5-10'}
-            </p>
+            {missionStartPoint && missionEndPoint ? (
+              <p className="text-xs font-semibold text-foreground">
+                Liczba sensorów: <span className="text-primary">{sensorCount}</span>
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Wybierz trasę aby zobaczyć liczbę sensorów
+              </p>
+            )}
           </div>
 
           {/* Cost and Weight Summary */}
           {missionStartPoint && missionEndPoint && (
             <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4 space-y-3">
               <h4 className="font-semibold text-sm text-amber-900 dark:text-amber-200">
-                Szacunkowe koszty i waga
+                Dokładne koszty i waga
               </h4>
               
               <div className="space-y-2 ml-6 text-sm">
@@ -216,6 +229,11 @@ export const DeploymentDialog = () => {
                 <div className="flex items-center justify-between text-muted-foreground">
                   <span>Rozstaw ESP:</span>
                   <span className="font-semibold text-amber-600 dark:text-amber-400">{spacing} m</span>
+                </div>
+                
+                <div className="flex items-center justify-between text-muted-foreground">
+                  <span>Liczba sensorów:</span>
+                  <span className="font-semibold text-amber-600 dark:text-amber-400">{sensorCount}</span>
                 </div>
 
                 <div className="border-t border-amber-200 dark:border-amber-700 pt-2 mt-2">
